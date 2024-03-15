@@ -18,19 +18,23 @@ const mailGun = () =>
 const signUp = async (reqBody) => {
   try {
     const hashPassword = bcrypt.hashSync(reqBody.password, 10)
-    reqBody.password = hashPassword
-    const createdUser = await userModel.createNew(reqBody)
+    const createdUser = await userModel.createNew({
+      email: reqBody.email,
+      password: hashPassword,
+    })
     const newUser = await userModel.getByIdId(createdUser.insertedId)
     const token = jwt.sign(
       {
         id: newUser._id,
-        userName: newUser.userName,
         email: newUser.email,
       },
       env.JWT_SECRET
     )
     const authUser = await userModel.updateToken(newUser._id, token)
-    return { message: 'User created', email: authUser.email, accesToken: token }
+    return {
+      message: 'User created',
+      data: { email: authUser.email, accesToken: token },
+    }
   } catch (error) {
     throw error
   }
@@ -38,17 +42,28 @@ const signUp = async (reqBody) => {
 const login = async (reqBody) => {
   try {
     const user = await userModel.getByEmail(reqBody.email)
+    if (!user)
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        'Email hoặc mật khẩu không chính xác'
+      )
 
     const isPasswordMatch = bcrypt.compareSync(reqBody.password, user.password)
     if (!isPasswordMatch || !user)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid email or password!')
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        'Email hoặc mật khẩu không chính xác'
+      )
 
     const token = jwt.sign(
       { id: user._id, userName: user.userName, email: user.email },
       env.JWT_SECRET
     )
     const authUser = await userModel.updateToken(user._id, token)
-    return { email: authUser.email, accesToken: authUser.token }
+    return {
+      message: 'Login success',
+      data: { email: authUser.email, accessToken: authUser.token },
+    }
   } catch (error) {
     throw error
   }
@@ -125,6 +140,17 @@ const resetPassword = async (accesToken, newPassword) => {
   return { message: 'Password updated', email: updatedUser.email }
 }
 
+const updateAvatar = async (accesToken, avatar) => {
+  try {
+    const email = jwt.verify(accesToken, env.JWT_SECRET).email
+    const avataBase64 = avatar.buffer.toString('base64')
+    const updatedUser = await userModel.updateAvatar(email, avataBase64)
+    return { message: 'Avatar updated' }
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   signUp,
   login,
@@ -132,4 +158,5 @@ export const userService = {
   forgetPassword,
   verifyOtp,
   resetPassword,
+  updateAvatar,
 }

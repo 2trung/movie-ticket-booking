@@ -1,6 +1,4 @@
 import express from 'express'
-const swaggerUi = require('swagger-ui-express')
-const specs = require('./swagger')
 import cors from 'cors'
 import exitHook from 'async-exit-hook'
 import { CONNECT_DB, CLOSE_DB, GET_DB } from './config/mongodb'
@@ -14,8 +12,7 @@ const START_SERVER = () => {
   app.use(express.json())
   app.use(cors())
 
-  app.use('/', APIs_V1)
-  app.use('/swagger', swaggerUi.serve, swaggerUi.setup(specs))
+  app.use('/api', APIs_V1)
 
   app.use(errorHandlingMiddleware)
 
