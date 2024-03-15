@@ -10,5 +10,8 @@ export const env = {
   JWT_SECRET: process.env.JWT_SECRET,
   MAILGUN_API_KEY: process.env.MAILGUN_API_KEY,
   MAILGUN_DOMAIN: process.env.MAILGUN_DOMAIN,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
   AUTHOR: process.env.AUTHOR,
 }
