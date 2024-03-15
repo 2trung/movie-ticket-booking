@@ -6,15 +6,16 @@ const signUp = async (req, res, next) => {
   const correctCondition = Joi.object({
     email: Joi.string().email().required().trim().strict(),
     password: Joi.string().required().min(6).max(50).trim().strict(),
-    userName: Joi.string().required().min(3).max(50).trim().strict(),
+    confirmation: Joi.any()
+      .valid(Joi.ref('password'))
+      .required()
+      .messages({ 'any.only': 'Password confirmation does not match' }),
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
     next()
   } catch (error) {
-    next(
-      new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
-    )
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
 const login = async (req, res, next) => {
@@ -26,9 +27,7 @@ const login = async (req, res, next) => {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
     next()
   } catch (error) {
-    next(
-      new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message)
-    )
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
 
@@ -80,6 +79,18 @@ const resetPassword = async (req, res, next) => {
       .valid(Joi.ref('newPassword'))
       .required()
       .messages({ 'any.only': 'Password confirmation does not match' }),
+  })
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
+  }
+}
+
+const updateAvatar = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    avatar: Joi.any().required(),
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })

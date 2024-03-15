@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
-  userName: Joi.string().required().min(3).max(50).trim().strict(),
+  userName: Joi.string().min(3).max(50).trim().strict(),
   email: Joi.string().email().required().trim().strict(),
   password: Joi.string().required().min(3).max(255).trim().strict(),
   createdAt: Joi.date().timestamp('javascript').default(Date.now()),
@@ -24,12 +24,6 @@ const validateBeforeCreate = async (data) => {
 const createNew = async (data) => {
   try {
     const validatedData = await validateBeforeCreate(data)
-    const userNameExist = await GET_DB()
-      .collection(USER_COLLECTION_NAME)
-      .findOne({ userName: validatedData.userName })
-    if (userNameExist) {
-      throw new Error('Username unavailable!')
-    }
     const emailExist = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .findOne({ email: validatedData.email })
@@ -119,6 +113,20 @@ const update = async (email, data) => {
     throw new Error(error)
   }
 }
+const updateAvatar = async (email, avatar) => {
+  try {
+    const updatedUser = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { email: email },
+        { $set: { avatar: avatar, updatedAt: Date.now() } },
+        { returnDocument: 'after' }
+      )
+    return updatedUser
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
 export const userModel = {
   USER_COLLECTION_NAME,
@@ -129,4 +137,5 @@ export const userModel = {
   getByEmail,
   updateToken,
   changePassword,
+  updateAvatar,
 }

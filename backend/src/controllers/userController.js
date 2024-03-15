@@ -60,6 +60,15 @@ const resetPassword = async (req, res, next) => {
     next(error)
   }
 }
+const updateAvatar = async (req, res, next) => {
+  try {
+    const accessToken = req.headers.authorization.split(' ')[1]
+    const updatedUser = await userService.updateAvatar(accessToken, req.file)
+    res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const userController = {
   signUp,
@@ -68,4 +77,5 @@ export const userController = {
   forgetPassword,
   verifyOtp,
   resetPassword,
+  updateAvatar,
 }
