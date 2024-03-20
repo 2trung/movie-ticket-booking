@@ -33,7 +33,7 @@ const signUp = async (reqBody) => {
     const authUser = await userModel.updateToken(newUser._id, token)
     return {
       message: 'User created',
-      data: { email: authUser.email, accesToken: token },
+      data: { email: authUser.email, accessToken: token },
     }
   } catch (error) {
     throw error
@@ -110,15 +110,14 @@ const forgetPassword = async (email) => {
       )
     const token = jwt.sign({ email: user.email }, env.JWT_SECRET)
     userModel.updateToken(user._id, token)
-    return { message: 'OTP sent to your email', accesToken: token }
+    return { message: 'OTP sent to your email', accessToken: token }
   } catch (error) {
     throw error
   }
 }
-const verifyOtp = async (accesToken, otp) => {
-  const email = jwt.verify(accesToken, env.JWT_SECRET).email
+const verifyOtp = async (accessToken, otp) => {
+  const email = jwt.verify(accessToken, env.JWT_SECRET).email
   const userOtp = await otpModel.getOtpByEmail(email)
-  console.log(userOtp)
   if (!userOtp) throw new ApiError(StatusCodes.NOT_FOUND, 'OTP not found')
   if (!bcrypt.compareSync(otp, userOtp.otp))
     throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid OTP')
@@ -128,21 +127,21 @@ const verifyOtp = async (accesToken, otp) => {
   const user = await userModel.getByEmail(email)
   await userModel.updateToken(user._id, token)
   otpModel.removeOtp(email)
-  return { message: 'OTP verified', accesToken: token }
+  return { message: 'OTP verified', accessToken: token }
 }
-const resetPassword = async (accesToken, newPassword) => {
-  const isOtpVerified = jwt.verify(accesToken, env.JWT_SECRET).otpVerify
+const resetPassword = async (accessToken, newPassword) => {
+  const isOtpVerified = jwt.verify(accessToken, env.JWT_SECRET).otpVerify
   if (!isOtpVerified)
     throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP not verified')
-  const email = jwt.verify(accesToken, env.JWT_SECRET).email
+  const email = jwt.verify(accessToken, env.JWT_SECRET).email
   const hashPassword = bcrypt.hashSync(newPassword, 10)
   const updatedUser = await userModel.changePassword(email, hashPassword)
   return { message: 'Password updated', email: updatedUser.email }
 }
 
-const updateAvatar = async (accesToken, avatar) => {
+const updateAvatar = async (accessToken, avatar) => {
   try {
-    const email = jwt.verify(accesToken, env.JWT_SECRET).email
+    const email = jwt.verify(accessToken, env.JWT_SECRET).email
     const avataBase64 = avatar.buffer.toString('base64')
     const updatedUser = await userModel.updateAvatar(email, avataBase64)
     return { message: 'Avatar updated' }
