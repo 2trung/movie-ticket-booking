@@ -1,9 +1,12 @@
-import ContainerComponent from '../../components/ContainerComponent'
+import { useRef, useState, useEffect } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
-import { useRef, useState, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import Toast from 'react-native-toast-message'
+
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import ContainerComponent from '../../components/ContainerComponent'
+import CustomHeader from '../../components/CustomHeader'
 import { verifyOtpAPI, resendOtpAPI } from '../../apis'
 
 const VerificationScreen = ({ navigation }) => {
@@ -18,9 +21,9 @@ const VerificationScreen = ({ navigation }) => {
 
   useEffect(() => {
     const getEmail = async () => {
-      const auth = await AsyncStorage.getItem('auth')
-      const authData = JSON.parse(auth || '{}')
-      setEmail(authData.email)
+      const user = await AsyncStorage.getItem('auth')
+      const userData = JSON.parse(user || '{}')
+      setEmail(userData.email)
     }
     getEmail()
   }, [])
@@ -31,6 +34,7 @@ const VerificationScreen = ({ navigation }) => {
   const ref4 = useRef<any>()
 
   const [codeValues, setCodeValues] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     ref1.current.focus()
@@ -60,7 +64,9 @@ const VerificationScreen = ({ navigation }) => {
       })
   }
   const handleVerifyOtp = async () => {
+    setLoading(true)
     if (codeValues.join('').length < 4) {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Vui lòng nhập đủ mã OTP',
@@ -70,6 +76,7 @@ const VerificationScreen = ({ navigation }) => {
     const authData = JSON.parse(auth || '{}')
     await verifyOtpAPI(authData.email, codeValues.join(''))
       .then((res) => {
+        setLoading(false)
         Toast.show({
           type: 'success',
           text1: res.message,
@@ -78,6 +85,7 @@ const VerificationScreen = ({ navigation }) => {
         navigation.navigate('ResetPasswordScreen')
       })
       .catch((err) => {
+        setLoading(false)
         Toast.show({
           type: 'error',
           text1: err.response.data.message,
@@ -90,19 +98,19 @@ const VerificationScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Button
           icon='arrow-left'
-          style={{
-            position: 'absolute',
-            left: '5%',
-            top: 0,
-          }}
+          style={styles.backButton}
           textColor='#fff'
           onPress={() => navigation.goBack()}
         >
           Quay lại
         </Button>
-        <Text style={styles.textLarge}>Xác thực OTP</Text>
-        <Text style={styles.text}>Mã OTP đã được gửi đến email</Text>
-        <Text style={{ ...styles.text, marginBottom: 50 }}>{email}</Text>
+        <CustomHeader text='Xác thực OTP' variant='title' />
+        <CustomHeader text='Mã OTP đã được gửi đến email' variant='body2' />
+        <CustomHeader
+          text={email}
+          variant='body2'
+          style={{ marginBottom: 50 }}
+        />
         <View style={styles.otpRow}>
           <TextInput
             ref={ref1}
@@ -197,11 +205,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '30%',
   },
-  textLarge: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
   text: {
     color: '#fff',
   },
@@ -221,11 +224,9 @@ const styles = StyleSheet.create({
     width: 55,
     borderRadius: 12,
     borderWidth: 1,
-    // borderColor: appColors.gray2,
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: 24,
-    // fontFamily: fontFamilies.bold,
     textAlign: 'center',
     backgroundColor: '#000',
   },
@@ -234,5 +235,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     marginTop: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    left: '5%',
+    top: 0,
   },
 })

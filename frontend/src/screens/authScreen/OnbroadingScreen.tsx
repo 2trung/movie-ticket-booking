@@ -1,15 +1,16 @@
-import { StatusBar } from 'expo-status-bar'
 import { Button } from 'react-native-paper'
 import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
+  Platform,
+  StatusBar,
+  SafeAreaView,
 } from 'react-native'
 
-import Carousel from '../../components/carousel/carousel'
-import AppStyle from '../../theme'
+import Carousel from '../../components/Carousel'
+import CustomHeader from '../../components/CustomHeader'
 
 const OnbroadingScreen = ({ navigation }) => {
   const footerLink = [
@@ -19,8 +20,7 @@ const OnbroadingScreen = ({ navigation }) => {
     'Liên hệ',
   ]
   return (
-    <SafeAreaView style={AppStyle.StyleMain.container}>
-      <StatusBar style='light' />
+    <SafeAreaView style={styles.container}>
       <Text
         style={{
           color: '#FCC434',
@@ -43,16 +43,16 @@ const OnbroadingScreen = ({ navigation }) => {
       >
         Xin chào
       </Text>
-      <Text style={AppStyle.StyleMain.text}>Đăng Ký Thành Viên</Text>
-      <Text style={AppStyle.StyleMain.text}>Nhận Ngay Ưu Đãi</Text>
+      <Text style={styles.text}>Đăng Ký Thành Viên</Text>
+      <Text style={styles.text}>Nhận Ngay Ưu Đãi</Text>
 
       <View style={{ position: 'absolute', bottom: 50, width: '100%' }}>
         <Button
           mode='contained'
           buttonColor='#FCC434'
           textColor='#000'
-          labelStyle={AppStyle.StyleMain.textButton}
-          style={AppStyle.StyleMain.button}
+          labelStyle={styles.textButton}
+          style={styles.button}
           onPress={() => navigation.navigate('LoginScreen')}
         >
           Đăng nhập
@@ -61,8 +61,8 @@ const OnbroadingScreen = ({ navigation }) => {
         <Button
           mode='outlined'
           textColor='#fff'
-          labelStyle={AppStyle.StyleMain.textButton}
-          style={AppStyle.StyleMain.button}
+          labelStyle={styles.textButton}
+          style={styles.button}
           onPress={() => navigation.navigate('RegisterScreen')}
         >
           Đăng ký
@@ -78,7 +78,7 @@ const OnbroadingScreen = ({ navigation }) => {
         >
           {footerLink.map((item, index) => (
             <TouchableOpacity key={index}>
-              <Text style={AppStyle.StyleMain.textsmall}>{item}</Text>
+              <Text style={styles.textsmall}>{item}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -86,5 +86,31 @@ const OnbroadingScreen = ({ navigation }) => {
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  text: {
+    color: '#fff',
+    alignSelf: 'center',
+  },
+  textsmall: {
+    color: '#fff',
+    alignSelf: 'center',
+    fontSize: 10,
+  },
+  textButton: {
+    fontSize: 16,
+    lineHeight: 30,
+    fontWeight: 'bold',
+  },
+  button: {
+    borderRadius: 10,
+    margin: 10,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+})
 
 export default OnbroadingScreen

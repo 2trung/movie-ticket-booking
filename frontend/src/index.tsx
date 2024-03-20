@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View, SafeAreaView, AppRegistry } from 'react-native'
-import Carousel from './components/carousel/carousel'
+import Carousel from './components/Carousel'
 
 export default function App() {
   return (

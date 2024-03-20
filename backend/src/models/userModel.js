@@ -1,12 +1,18 @@
 import Joi from 'joi'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { GET_DB } from '~/config/mongodb'
 import { ObjectId } from 'mongodb'
+import { red, blue, yellow } from '../utils/defaultAvatar'
+
+const defaultAvatar = [red, blue, yellow]
+const randomAvatar = () => {
+  return defaultAvatar[Math.floor(Math.random() * defaultAvatar.length)]
+}
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
-  userName: Joi.string().min(3).max(50).trim().strict(),
+  name: Joi.string().min(3).max(50).trim().default(''),
   email: Joi.string().email().required().trim().strict(),
+  phone: Joi.string().min(10).max(11).trim().default(''),
   password: Joi.string().required().min(3).max(255).trim().strict(),
   createdAt: Joi.date().timestamp('javascript').default(Date.now()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -32,7 +38,7 @@ const createNew = async (data) => {
     }
     const createdUser = await GET_DB()
       .collection(USER_COLLECTION_NAME)
-      .insertOne(validatedData)
+      .insertOne({ ...validatedData, avatar: randomAvatar() })
     return createdUser
   } catch (error) {
     throw new Error(error)
@@ -95,39 +101,21 @@ const changePassword = async (email, newPassword) => {
     throw new Error(error)
   }
 }
-const update = async (email, data) => {
-  try {
-    const updateData = { ...data }
-    INVALID_UPDATE_FIELDS.forEach((field) => {
-      delete updateData[field]
-    })
-    const updatedUser = await GET_DB()
-      .collection(USER_COLLECTION_NAME)
-      .findOneAndUpdate(
-        { email: email },
-        { $set: { ...updateData, updatedAt: Date.now() } },
-        { returnDocument: 'after' }
-      )
-    return updatedUser
-  } catch (error) {
-    throw new Error(error)
-  }
-}
-const updateAvatar = async (email, avatar) => {
-  try {
-    const updatedUser = await GET_DB()
-      .collection(USER_COLLECTION_NAME)
-      .findOneAndUpdate(
-        { email: email },
-        { $set: { avatar: avatar, updatedAt: Date.now() } },
-        { returnDocument: 'after' }
-      )
-    return updatedUser
-  } catch (error) {
-    throw new Error(error)
-  }
-}
 
+const updateProfile = async (data) => {
+  try {
+    const updatedUser = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { email: data.email },
+        { $set: data },
+        { returnDocument: 'after' }
+      )
+    return updatedUser
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -137,5 +125,5 @@ export const userModel = {
   getByEmail,
   updateToken,
   changePassword,
-  updateAvatar,
+  updateProfile,
 }

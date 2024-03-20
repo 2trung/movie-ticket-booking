@@ -1,63 +1,76 @@
-import { View, StyleSheet } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
+
 import Toast from 'react-native-toast-message'
+import { useSelector } from 'react-redux'
+import { userSelector } from '../../redux/reducers/userReducer'
 
-import { isValidateEmail } from '../../utils/emailValidate'
-import { registerAPI } from '../../apis'
-
-import CustomHeader from '../../components/CustomHeader'
 import ContainerComponent from '../../components/ContainerComponent'
+import CustomHeader from '../../components/CustomHeader'
 
-const RegisterScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+import { changePasswordAPI } from '../../apis'
+import { AntDesign } from '@expo/vector-icons'
 
-  const [showPassword, setShowPassword] = useState(false)
-  const toggleShowPassword = () => setShowPassword(!showPassword)
+const ChanegPasswordScreen = ({ navigation }) => {
+  const user = useSelector(userSelector)
 
+  const [oldPassword, setOldPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+
+  const [showOldPassword, setShowOldPassword] = useState(false)
+  const toggleShowOldPassword = () => setShowOldPassword(!showOldPassword)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const toggleShowNewPassword = () => setShowNewPassword(!showNewPassword)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword)
 
-  const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
+  const [loading, setLoading] = useState(false)
+
+  const handleChangePassword = async () => {
+    setLoading(true)
+
+    if (oldPassword === '' || newPassword === '' || confirmNewPassword === '') {
+      setLoading(false)
       return Toast.show({
         type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
+        text1: 'Vui lòng nhập đầy đủ thông tin',
       })
     }
 
-    if (!isValidateEmail(email)) {
-      return Toast.show({
-        type: 'error',
-        text1: 'Email không hợp lệ',
-      })
-    }
-
-    if (password !== confirmPassword) {
-      return Toast.show({
-        type: 'error',
-        text1: 'Mật khẩu không khớp',
-      })
-    }
-    if (password.length < 6) {
+    if (newPassword.length < 6) {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Mật khẩu phải có ít nhất 6 ký tự',
       })
     }
-    await registerAPI(email, password, confirmPassword)
+
+    if (newPassword !== confirmNewPassword) {
+      setLoading(false)
+      return Toast.show({
+        type: 'error',
+        text1: 'Mật khẩu không khớp',
+      })
+    }
+    await changePasswordAPI(
+      user.accessToken,
+      oldPassword,
+      newPassword,
+      confirmNewPassword
+    )
       .then((res) => {
-        Toast.show({
+        setLoading(false)
+        return Toast.show({
           type: 'success',
           text1: res.message,
         })
-        navigation.navigate('LoginScreen')
       })
       .catch((err) => {
-        Toast.show({
+        setLoading(false)
+        return Toast.show({
           type: 'error',
           text1: err.response.data.message,
         })
@@ -66,50 +79,64 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
-          style={styles.backButton}
-          textColor='#fff'
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            left: '5%',
+          }}
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={24} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader
-          text='Đăng ký'
+          text='Đổi mật khẩu'
           variant='title'
           style={{ marginBottom: 50 }}
         />
         <TextInput
-          placeholder='Email'
+          placeholder='Mật khẩu hiện tại'
           style={styles.input}
           underlineColor='#fff'
           activeUnderlineColor='#fff'
           textColor='#fff'
-          textContentType='emailAddress'
-          left={<TextInput.Icon icon='email-outline' color={'#fff'} />}
-          onChangeText={(email) => setEmail(email)}
-        />
-        <TextInput
-          placeholder='Mật khẩu'
-          style={styles.input}
-          underlineColor='#fff'
-          activeUnderlineColor='#fff'
-          textColor='#fff'
-          secureTextEntry={showPassword ? false : true}
-          onChangeText={(password) => setPassword(password)}
-          left={<TextInput.Icon icon='form-textbox-password' color={'#fff'} />}
+          secureTextEntry={showOldPassword ? false : true}
+          onChangeText={(password) => setOldPassword(password)}
           right={
-            showPassword ? (
+            showOldPassword ? (
               <TextInput.Icon
                 icon='eye'
                 color={'#fff'}
-                onPress={toggleShowPassword}
+                onPress={toggleShowOldPassword}
               />
             ) : (
               <TextInput.Icon
                 icon='eye-off'
                 color={'#fff'}
-                onPress={toggleShowPassword}
+                onPress={toggleShowOldPassword}
+              />
+            )
+          }
+        />
+        <TextInput
+          placeholder='Mật khẩu mới'
+          style={styles.input}
+          underlineColor='#fff'
+          activeUnderlineColor='#fff'
+          textColor='#fff'
+          secureTextEntry={showNewPassword ? false : true}
+          onChangeText={(password) => setNewPassword(password)}
+          right={
+            showNewPassword ? (
+              <TextInput.Icon
+                icon='eye'
+                color={'#fff'}
+                onPress={toggleShowNewPassword}
+              />
+            ) : (
+              <TextInput.Icon
+                icon='eye-off'
+                color={'#fff'}
+                onPress={toggleShowNewPassword}
               />
             )
           }
@@ -122,9 +149,8 @@ const RegisterScreen = ({ navigation }) => {
           textColor='#fff'
           secureTextEntry={showConfirmPassword ? false : true}
           onChangeText={(confirmPassword) =>
-            setConfirmPassword(confirmPassword)
+            setConfirmNewPassword(confirmPassword)
           }
-          left={<TextInput.Icon icon='form-textbox-password' color={'#fff'} />}
           right={
             showConfirmPassword ? (
               <TextInput.Icon
@@ -147,19 +173,10 @@ const RegisterScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
-          onPress={() => handleRegister()}
+          loading={loading}
+          onPress={handleChangePassword}
         >
-          Đăng ký
-        </Button>
-        <Button
-          mode='outlined'
-          // buttonColor='#FCC434'
-          textColor='#fff'
-          labelStyle={styles.textButton}
-          style={styles.button}
-          onPress={() => navigation.navigate('LoginScreen')}
-        >
-          Đăng nhập
+          Xác nhận
         </Button>
       </View>
     </ContainerComponent>
@@ -194,4 +211,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default RegisterScreen
+export default ChanegPasswordScreen

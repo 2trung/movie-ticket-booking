@@ -1,14 +1,17 @@
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
-import { useState, useEffect } from 'react'
-import AppStyle from '../../theme'
+import Toast from 'react-native-toast-message'
+import { useState } from 'react'
+
 import { loginAPI } from '../../apis'
 import { isValidateEmail } from '../../utils/emailValidate'
-import Toast from 'react-native-toast-message'
+
 import { useDispatch } from 'react-redux'
-import { addAuth } from '../../redux/reducers/authReducer'
+import { addUser } from '../../redux/reducers/userReducer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import ContainerComponent from '../../components/ContainerComponent'
+import CustomHeader from '../../components/CustomHeader'
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -39,7 +42,7 @@ const LoginScreen = ({ navigation }) => {
           type: 'success',
           text1: res.message,
         })
-        dispatch(addAuth(res.data))
+        dispatch(addUser(res.data))
         AsyncStorage.setItem('auth', JSON.stringify(res.data))
       })
       .catch((err) => {
@@ -55,20 +58,20 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Button
           icon='arrow-left'
-          style={{
-            position: 'absolute',
-            left: '5%',
-          }}
+          style={styles.backButton}
           textColor='#fff'
           onPress={() => navigation.goBack()}
         >
           Quay lại
         </Button>
-
-        <Text style={styles.textLarge}>Đăng nhập</Text>
+        <CustomHeader
+          text='Đăng nhập'
+          variant='title'
+          style={{ marginBottom: 50 }}
+        />
         <TextInput
           placeholder='Email'
-          style={{ backgroundColor: '#000', width: '90%', marginBottom: 20 }}
+          style={styles.input}
           underlineColor='#fff'
           activeUnderlineColor='#fff'
           textColor='#fff'
@@ -78,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
         />
         <TextInput
           placeholder='Mật khẩu'
-          style={{ backgroundColor: '#000', width: '90%', marginBottom: 20 }}
+          style={styles.input}
           underlineColor='#fff'
           activeUnderlineColor='#fff'
           textColor='#fff'
@@ -119,7 +122,6 @@ const LoginScreen = ({ navigation }) => {
         </Button>
         <Button
           mode='outlined'
-          // buttonColor='#FCC434'
           textColor='#fff'
           labelStyle={styles.textButton}
           style={styles.button}
@@ -148,11 +150,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 10,
   },
-  textLarge: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 50,
+  backButton: {
+    position: 'absolute',
+    left: '5%',
+    top: 0,
+  },
+  input: {
+    backgroundColor: '#000',
+    width: '90%',
+    marginBottom: 20,
   },
 })
 

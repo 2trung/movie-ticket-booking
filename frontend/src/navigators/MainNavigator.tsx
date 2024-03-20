@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 import TabNavigator from './TabNavigator'
-import EditProfileScreen from '../screens/profileScreen/EditProfileScreen'
+import { EditProfileScreen, ChangePasswordScreen } from '../screens'
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator()
@@ -14,6 +14,10 @@ const MainNavigator = () => {
     >
       <Stack.Screen name='TabNavigator' component={TabNavigator} />
       <Stack.Screen name='EditProfileScreen' component={EditProfileScreen} />
+      <Stack.Screen
+        name='ChangePasswordScreen'
+        component={ChangePasswordScreen}
+      />
     </Stack.Navigator>
   )
 }

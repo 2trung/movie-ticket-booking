@@ -1,26 +1,34 @@
-import { useEffect } from 'react'
 import { FC } from 'react'
-import ContainerComponent from '../../components/ContainerComponent'
-import { ScrollView, Text, View, Image, TouchableOpacity } from 'react-native'
+import {
+  ScrollView,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native'
+
+import { userSelector } from '../../redux/reducers/userReducer'
 import { useSelector } from 'react-redux'
-import { authSelector } from '../../redux/reducers/authReducer'
-import { StyleSheet } from 'react-native'
+import { removeUser } from '../../redux/reducers/userReducer'
+import { useDispatch } from 'react-redux'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import ContainerComponent from '../../components/ContainerComponent'
+
 import { FontAwesome } from '@expo/vector-icons'
 import { Fontisto } from '@expo/vector-icons'
 import { Feather } from '@expo/vector-icons'
 import { Octicons } from '@expo/vector-icons'
 import { MaterialIcons } from '@expo/vector-icons'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { removeAuth } from '../../redux/reducers/authReducer'
-import { useDispatch } from 'react-redux'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
     await AsyncStorage.clear()
-    dispatch(removeAuth({}))
+    dispatch(removeUser({}))
   }
   const selection = [
     {
@@ -50,7 +58,9 @@ const ProfileScreen = ({ navigation }) => {
       label: 'Đổi mật khẩu',
       icon: <MaterialIcons name='lock' size={32} color='#fff' />,
       isLast: false,
-      handle: () => {},
+      handle: () => {
+        navigation.navigate('ChangePasswordScreen')
+      },
     },
     {
       label: 'Đăng xuất',
@@ -59,7 +69,7 @@ const ProfileScreen = ({ navigation }) => {
       handle: handleLogout,
     },
   ]
-  const auth = useSelector(authSelector)
+  const user = useSelector(userSelector)
   const handleEditProfile = () => {
     navigation.navigate('EditProfileScreen')
   }
@@ -72,44 +82,30 @@ const ProfileScreen = ({ navigation }) => {
             name='pencil-square-o'
             size={24}
             color='#fff'
-            style={{ position: 'absolute', right: 10, top: 10 }}
+            style={styles.editBtn}
           />
         </TouchableOpacity>
 
-        {/* User */}
-        <View style={{ marginHorizontal: 20, marginVertical: 30 }}>
-          <View style={styles.flexRow}>
-            <Image
-              source={{ uri: `data:image/jpeg;base64,${auth.avatar}` }}
-              style={{ width: 100, height: 100, borderRadius: 999 }}
-            />
-            <View style={{ justifyContent: 'space-around' }}>
-              <Text style={{ color: '#fff', fontSize: 28, fontWeight: '700' }}>
-                Trung Nguyen
-              </Text>
-              <View>
-                <View
-                  style={{
-                    ...styles.flexRow,
-                    columnGap: 10,
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Feather name='phone' size={24} color='#fff' />
-                  <Text style={{ color: '#fff' }}>0987654321</Text>
-                </View>
-                <View
-                  style={{
-                    ...styles.flexRow,
-                    columnGap: 10,
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <Fontisto name='email' size={24} color='#fff' />
-                  <Text style={{ color: '#fff' }}>{auth.email}</Text>
-                </View>
+        {/* Thông tin user container */}
+        <View style={styles.flexRow}>
+          <Image
+            source={{ uri: `data:image/jpeg;base64,${user.avatar}` }}
+            style={styles.avatar}
+          />
+          <View style={{ justifyContent: 'space-around' }}>
+            <Text style={styles.userName}>
+              {user.name ? user.name : 'User'}
+            </Text>
+            <View>
+              <View style={styles.flexRowStart}>
+                <Feather name='phone' size={24} color='#fff' />
+                <Text style={{ color: '#fff' }}>
+                  {user.phone === '' ? '+84xxxxxxxxx' : user.phone}
+                </Text>
+              </View>
+              <View style={styles.flexRowStart}>
+                <Fontisto name='email' size={24} color='#fff' />
+                <Text style={{ color: '#fff' }}>{user.email}</Text>
               </View>
             </View>
           </View>
@@ -182,6 +178,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     columnGap: 20,
     justifyContent: 'center',
+    marginHorizontal: 20,
+    marginVertical: 30,
+  },
+  flexRowStart: {
+    flex: 1,
+    flexGrow: 0,
+    flexDirection: 'row',
+    columnGap: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  editBtn: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 999,
+    borderColor: '#fff',
+    borderWidth: 2,
+  },
+  userName: {
+    color: '#fff',
+    fontSize: 28,
+    fontWeight: '700',
   },
 })
 export default ProfileScreen
