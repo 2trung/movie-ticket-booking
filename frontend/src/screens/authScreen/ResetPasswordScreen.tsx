@@ -1,10 +1,13 @@
-import ContainerComponent from '../../components/ContainerComponent'
-import { Text, View, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
+
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 import { resetPasswordAPI } from '../../apis'
+import CustomHeader from '../../components/CustomHeader'
+import ContainerComponent from '../../components/ContainerComponent'
 
 const ResetPasswordScreen = ({ navigation }) => {
   const [password, setPassword] = useState('')
@@ -18,8 +21,8 @@ const ResetPasswordScreen = ({ navigation }) => {
     setShowConfirmPassword(!showConfirmPassword)
 
   const handleChangePassword = async () => {
-    const auth = await AsyncStorage.getItem('auth')
-    const authData = JSON.parse(auth || '{}')
+    const user = await AsyncStorage.getItem('user')
+    const userData = JSON.parse(user || '{}')
 
     if (password !== confirmPassword) {
       return Toast.show({
@@ -34,7 +37,7 @@ const ResetPasswordScreen = ({ navigation }) => {
       })
     }
 
-    await resetPasswordAPI(authData.email, password, confirmPassword)
+    await resetPasswordAPI(userData.email, password, confirmPassword)
       .then((res) => {
         Toast.show({
           type: 'success',
@@ -67,10 +70,14 @@ const ResetPasswordScreen = ({ navigation }) => {
         >
           Quay lại
         </Button>
-        <Text style={styles.textLarge}>Đặt lại mật khẩu</Text>
+        <CustomHeader
+          text='Đặt lại mật khẩu'
+          variant='title'
+          style={{ marginBottom: 50 }}
+        />
         <TextInput
-          placeholder='New Password'
-          style={{ backgroundColor: '#000', width: '90%', marginBottom: 20 }}
+          placeholder='Đặt mật khẩu mới'
+          style={styles.input}
           underlineColor='#fff'
           activeUnderlineColor='#fff'
           textColor='#fff'
@@ -93,8 +100,8 @@ const ResetPasswordScreen = ({ navigation }) => {
           }
         />
         <TextInput
-          placeholder='Confirm Password'
-          style={{ backgroundColor: '#000', width: '90%', marginBottom: 20 }}
+          placeholder='Xác nhận mật khẩu mới'
+          style={styles.input}
           underlineColor='#fff'
           activeUnderlineColor='#fff'
           textColor='#fff'
@@ -141,42 +148,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '30%',
   },
-  textLarge: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 50,
-  },
-  text: {
-    color: '#fff',
-  },
   textButton: {
     fontSize: 16,
     lineHeight: 30,
     fontWeight: 'bold',
   },
   button: {
-    borderRadius: 10,
-    margin: 50,
     width: '90%',
+    borderRadius: 10,
+    margin: 10,
+  },
+  backButton: {
+    position: 'absolute',
+    left: '5%',
+    top: 0,
   },
   input: {
-    height: 55,
-    width: 55,
-    borderRadius: 12,
-    borderWidth: 1,
-    // borderColor: appColors.gray2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: 24,
-    // fontFamily: fontFamilies.bold,
-    textAlign: 'center',
     backgroundColor: '#000',
-  },
-  otpRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    marginTop: 20,
+    width: '90%',
+    marginBottom: 20,
   },
 })

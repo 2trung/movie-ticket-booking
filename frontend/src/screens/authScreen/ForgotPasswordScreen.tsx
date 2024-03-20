@@ -1,13 +1,17 @@
-import { Text, View, StyleSheet } from 'react-native'
-import ContainerComponent from '../../components/ContainerComponent'
+import { View, StyleSheet } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
-import { forgetPasswordAPI } from '../../apis'
-import { useState } from 'react'
 import Toast from 'react-native-toast-message'
-import { isValidateEmail } from '../../utils/emailValidate'
+import { useState } from 'react'
+
+import ContainerComponent from '../../components/ContainerComponent'
+import CustomHeader from '../../components/CustomHeader'
+
 import { useDispatch } from 'react-redux'
-import { addAuth } from '../../redux/reducers/authReducer'
+import { addUser } from '../../redux/reducers/userReducer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { isValidateEmail } from '../../utils/emailValidate'
+import { forgetPasswordAPI } from '../../apis'
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -23,7 +27,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
     await forgetPasswordAPI(email)
       .then((res) => {
-        dispatch(addAuth(res.data))
+        dispatch(addUser(res.data))
         AsyncStorage.setItem('auth', JSON.stringify(res.data))
         navigation.navigate('VerificationScreen')
       })
@@ -39,18 +43,19 @@ const ForgotPasswordScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Button
           icon='arrow-left'
-          style={{
-            position: 'absolute',
-            left: '5%',
-            top: 0,
-          }}
+          style={styles.backButton}
           textColor='#fff'
           onPress={() => navigation.goBack()}
         >
           Quay lại
         </Button>
-        <Text style={styles.textLarge}>Đặt lại mật khẩu</Text>
-        <Text style={styles.text}>Hãy nhập địa chỉ Email của bạn</Text>
+        <CustomHeader text='Đặt lại mật khẩu' variant='title' />
+        <CustomHeader
+          text='Hãy nhập địa chỉ Email của bạn'
+          variant='body2'
+          style={{ marginBottom: 50 }}
+        />
+
         <TextInput
           placeholder='Email'
           style={{ backgroundColor: '#000', width: '90%', marginBottom: 20 }}
@@ -84,11 +89,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '30%',
   },
-  textLarge: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
   text: {
     color: '#fff',
     marginBottom: 50,
@@ -103,4 +103,5 @@ const styles = StyleSheet.create({
     margin: 10,
     width: '90%',
   },
+  backButton: { position: 'absolute', left: '5%', top: 0 },
 })

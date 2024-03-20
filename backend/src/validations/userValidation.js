@@ -33,13 +33,12 @@ const login = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   const correctCondition = Joi.object({
-    email: Joi.string().email().required().trim().strict(),
-    oldPassword: Joi.string().required().min(6).max(50).trim().strict(),
+    oldPassword: Joi.string().required().min(1).max(50).trim().strict(),
     newPassword: Joi.string().required().min(6).max(50).trim().strict(),
     confirmation: Joi.any()
       .valid(Joi.ref('newPassword'))
       .required()
-      .messages({ 'any.only': 'Password confirmation does not match' }),
+      .messages({ 'any.only': 'Mật khẩu không khớp' }),
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
@@ -63,6 +62,7 @@ const forgetPassword = async (req, res, next) => {
 
 const verifyOtp = async (req, res, next) => {
   const correctCondition = Joi.object({
+    email: Joi.string().email().required().trim().strict(),
     otp: Joi.string().required().min(4).max(6).trim().strict(),
   })
   try {
@@ -74,6 +74,7 @@ const verifyOtp = async (req, res, next) => {
 }
 const resetPassword = async (req, res, next) => {
   const correctCondition = Joi.object({
+    email: Joi.string().email().required().trim().strict(),
     newPassword: Joi.string().required().min(6).max(50).trim().strict(),
     confirmation: Joi.any()
       .valid(Joi.ref('newPassword'))
@@ -88,9 +89,9 @@ const resetPassword = async (req, res, next) => {
   }
 }
 
-const updateAvatar = async (req, res, next) => {
+const resendOtp = async (req, res, next) => {
   const correctCondition = Joi.object({
-    avatar: Joi.any().required(),
+    email: Joi.string().email().required().trim().strict(),
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })
@@ -100,6 +101,20 @@ const updateAvatar = async (req, res, next) => {
   }
 }
 
+const updateProfile = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    email: Joi.string().email().required().trim().strict(),
+    name: Joi.string().min(3).max(50).trim().strict().allow(''),
+    phone: Joi.string().min(10).max(15).trim().strict().allow(''),
+    avatar: Joi.string().trim().strict(),
+  })
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
+  }
+}
 export const userValidation = {
   signUp,
   login,
@@ -107,4 +122,6 @@ export const userValidation = {
   forgetPassword,
   verifyOtp,
   resetPassword,
+  resendOtp,
+  updateProfile,
 }

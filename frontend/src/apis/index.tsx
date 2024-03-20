@@ -1,5 +1,4 @@
 import axios from 'axios'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { API_ROOT } from '../utils/constaints'
 
 export const loginAPI = async (email, password) => {
@@ -56,11 +55,55 @@ export const getUserAPI = async (accessToken) => {
   })
   return response.data
 }
-export const updateAvatarAPI = async (accessToken, image) => {
-  const response = await axios.put(`${API_ROOT}/user/update-avatar`, image, {
+
+export const updateProfileAPI = async (accessToken, name, phone, email) => {
+  const response = await axios.put(
+    `${API_ROOT}/user/update-profile`,
+    {
+      name: name,
+      phone: phone,
+      email: email,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  )
+  return response.data
+}
+
+export const updateAvatarAPI = async (accessToken, avatar) => {
+  const formData = new FormData()
+  formData.append('image', avatar)
+
+  const response = await axios.put(`${API_ROOT}/user/update-avatar`, formData, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'multipart/form-data',
     },
   })
+  return response.data
+}
+
+export const changePasswordAPI = async (
+  accessToken,
+  oldPassword,
+  newPassword,
+  confirmNewPassword
+) => {
+  const response = await axios.put(
+    `${API_ROOT}/user/change-password`,
+    {
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+      confirmation: confirmNewPassword,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  )
   return response.data
 }
