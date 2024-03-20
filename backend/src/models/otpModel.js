@@ -38,7 +38,6 @@ const createNew = async (data) => {
 }
 const getOtpByEmail = async (email) => {
   try {
-    console.log(email)
     return await GET_DB()
       .collection(OTP_COLLECTION_NAME)
       .findOne({ email: email })

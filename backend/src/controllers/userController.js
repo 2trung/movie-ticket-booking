@@ -41,8 +41,8 @@ const forgetPassword = async (req, res, next) => {
 }
 const verifyOtp = async (req, res, next) => {
   try {
-    const accesToken = req.headers.authorization.split(' ')[1]
-    const updatedUser = await userService.verifyOtp(accesToken, req.body.otp)
+    const accessToken = req.headers.authorization.split(' ')[1]
+    const updatedUser = await userService.verifyOtp(accessToken, req.body.otp)
     res.status(StatusCodes.OK).json(updatedUser)
   } catch (error) {
     next(error)
@@ -50,9 +50,9 @@ const verifyOtp = async (req, res, next) => {
 }
 const resetPassword = async (req, res, next) => {
   try {
-    const accesToken = req.headers.authorization.split(' ')[1]
+    const accessToken = req.headers.authorization.split(' ')[1]
     const updatedUser = await userService.resetPassword(
-      accesToken,
+      accessToken,
       req.body.newPassword
     )
     res.status(StatusCodes.OK).json(updatedUser)
