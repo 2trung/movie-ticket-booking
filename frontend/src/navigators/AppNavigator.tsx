@@ -1,6 +1,3 @@
-import AsyncStorage, {
-  useAsyncStorage,
-} from '@react-native-async-storage/async-storage'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { addUser, userSelector } from '../redux/reducers/userReducer'
@@ -12,7 +9,7 @@ import { getUserAPI } from '../apis'
 const AppRouters = () => {
   const [isShowSplash, setIsShowSplash] = useState(true)
 
-  const { setItem } = useAsyncStorage('auth')
+  // const { setItem } = useAsyncStorage('auth')
 
   const user = useSelector(userSelector)
   const dispatch = useDispatch()
@@ -34,13 +31,11 @@ const AppRouters = () => {
   }, [])
 
   const checkLogin = async () => {
-    const auth = await AsyncStorage.getItem('auth')
-    const authData = JSON.parse(auth || '{}')
-    if (authData.accessToken) {
-      const user = await getUserAPI(authData.accessToken)
-      dispatch(addUser(user))
-      await setItem(JSON.stringify(user.accessToken))
-    } else {
+    try {
+      const response = await getUserAPI()
+      dispatch(addUser(response))
+      setIsShowSplash(false)
+    } catch (error) {
       setIsShowSplash(false)
     }
   }

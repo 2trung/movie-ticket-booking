@@ -36,9 +36,9 @@ const VerificationScreen = ({ navigation }) => {
   const [codeValues, setCodeValues] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    ref1.current.focus()
-  }, [])
+  // useEffect(() => {
+  //   ref1.current.focus()
+  // }, [])
 
   const handleChangeCode = (val: string, index: number) => {
     const data = [...codeValues]
@@ -173,6 +173,7 @@ const VerificationScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
+          loading={loading}
           onPress={() => handleVerifyOtp()}
         >
           Gửi

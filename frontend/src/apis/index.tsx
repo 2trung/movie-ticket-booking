@@ -1,5 +1,5 @@
-import axios from 'axios'
-import { API_ROOT } from '../utils/constaints'
+import axios from '../utils/axiosInterceptors'
+import { API_ROOT } from '../utils/apiRoot'
 
 export const loginAPI = async (email, password) => {
   const response = await axios.post(`${API_ROOT}/user/login`, {
@@ -47,39 +47,26 @@ export const registerAPI = async (email, password, confirmPassword) => {
   return response.data
 }
 
-export const getUserAPI = async (accessToken) => {
-  const response = await axios.get(`${API_ROOT}/user/get-user`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+export const getUserAPI = async () => {
+  const response = await axios.get(`${API_ROOT}/user/get-user`)
+  return response.data
+}
+
+export const updateProfileAPI = async (name, phone, email) => {
+  const response = await axios.put(`${API_ROOT}/user/update-profile`, {
+    name: name,
+    phone: phone,
+    email: email,
   })
   return response.data
 }
 
-export const updateProfileAPI = async (accessToken, name, phone, email) => {
-  const response = await axios.put(
-    `${API_ROOT}/user/update-profile`,
-    {
-      name: name,
-      phone: phone,
-      email: email,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  )
-  return response.data
-}
-
-export const updateAvatarAPI = async (accessToken, avatar) => {
+export const updateAvatarAPI = async (avatar) => {
   const formData = new FormData()
   formData.append('image', avatar)
 
   const response = await axios.put(`${API_ROOT}/user/update-avatar`, formData, {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'multipart/form-data',
     },
   })
@@ -87,23 +74,14 @@ export const updateAvatarAPI = async (accessToken, avatar) => {
 }
 
 export const changePasswordAPI = async (
-  accessToken,
   oldPassword,
   newPassword,
   confirmNewPassword
 ) => {
-  const response = await axios.put(
-    `${API_ROOT}/user/change-password`,
-    {
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-      confirmation: confirmNewPassword,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  )
+  const response = await axios.put(`${API_ROOT}/user/change-password`, {
+    oldPassword: oldPassword,
+    newPassword: newPassword,
+    confirmation: confirmNewPassword,
+  })
   return response.data
 }
