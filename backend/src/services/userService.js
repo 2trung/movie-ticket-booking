@@ -38,21 +38,16 @@ const sendOtp = async (email, otp) => {
     )
 }
 
-const getUser = async (accessToken) => {
+const getUser = async (_id) => {
   try {
-    const user = jwt.verify(accessToken, env.JWT_SECRET)
-    if (!user)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token không hợp lệ')
-
-    const userInfo = await userModel.getByEmail(user.email)
-    if (!userInfo)
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy người dùng')
+    const user = await userModel.getById(_id)
     return {
-      email: userInfo.email,
-      accessToken: userInfo.token,
-      avatar: userInfo.avatar,
-      name: userInfo.name,
-      phone: userInfo.phone,
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      accessToken: user.accessToken,
+      refeshToken: user.refreshToken,
+      avatar: user.avatar,
     }
   } catch (error) {
     throw error
@@ -67,22 +62,15 @@ const signUp = async (reqBody) => {
       password: hashPassword,
     })
     const newUser = await userModel.getByIdId(createdUser.insertedId)
-    const token = jwt.sign(
-      {
-        id: newUser._id,
-        email: newUser.email,
-      },
-      env.JWT_SECRET
-    )
-    const authUser = await userModel.updateToken(newUser._id, token)
     return {
       message: 'Đăng ký thành công',
-      data: { email: authUser.email, accessToken: token },
+      data: { _id: newUser._id, email: newUser.email },
     }
   } catch (error) {
     throw error
   }
 }
+
 const login = async (reqBody) => {
   try {
     const user = await userModel.getByEmail(reqBody.email)
@@ -99,35 +87,46 @@ const login = async (reqBody) => {
         'Email hoặc mật khẩu không chính xác'
       )
 
-    const token = jwt.sign(
-      { id: user._id, userName: user.userName, email: user.email },
-      env.JWT_SECRET
+    const accessToken = jwt.sign(
+      { _id: user._id, email: user.email },
+      env.ACCESS_TOKEN_SECRET,
+      { expiresIn: '1h' }
     )
-    const authUser = await userModel.updateToken(user._id, token)
+    const refreshToken = jwt.sign(
+      { _id: user._id, email: user.email },
+      env.REFRESH_TOKEN_SECRET,
+      { expiresIn: '30d' }
+    )
+
+    const authUser = await userModel.updateToken(user._id, {
+      accessToken,
+      refreshToken,
+    })
     return {
       message: 'Đăng nhập thành công',
       data: {
+        _id: authUser._id,
         email: authUser.email,
-        accessToken: authUser.token,
-        avatar: authUser.avatar,
         name: authUser.name,
         phone: authUser.phone,
+        accessToken: authUser.accessToken,
+        refreshToken: authUser.refreshToken,
+        avatar: authUser.avatar,
       },
     }
   } catch (error) {
     throw error
   }
 }
-const changePassword = async (accessToken, oldPassword, newPassword) => {
-  try {
-    const email = jwt.verify(accessToken, env.JWT_SECRET).email
-    if (!email)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token không hợp lệ')
-    const hashPassword = bcrypt.hashSync(newPassword, 10)
 
-    const user = await userModel.getByEmail(email)
+const changePassword = async (_id, oldPassword, newPassword) => {
+  try {
+    const user = await userModel.getByIdId(_id)
+
     if (!user)
       throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy người dùng')
+
+    const hashPassword = bcrypt.hashSync(newPassword, 10)
     const isPasswordMatch = bcrypt.compareSync(oldPassword, user.password)
     if (!isPasswordMatch)
       throw new ApiError(
@@ -139,7 +138,7 @@ const changePassword = async (accessToken, oldPassword, newPassword) => {
         StatusCodes.UNPROCESSABLE_ENTITY,
         'Mật khẩu mới phải khác mật khẩu cũ'
       )
-    const updatedUser = await userModel.changePassword(email, hashPassword)
+    const updatedUser = await userModel.changePassword(_id, hashPassword)
     return { message: 'Cập nhật mật khẩu thành công' }
   } catch (error) {
     throw error
@@ -227,20 +226,17 @@ const resetPassword = async (email, newPassword) => {
   if (!userOtp.isVerify)
     throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP chưa được xác nhận')
 
+  const user = await userModel.getByEmail(email)
   const hashPassword = bcrypt.hashSync(newPassword, 10)
 
-  const updatedUser = await userModel.changePassword(email, hashPassword)
-
+  const updatedUser = await userModel.changePassword(user._id, hashPassword)
   otpModel.removeOtp(email)
   return { message: 'Đã cập nhật mật khẩu mới', email: updatedUser.email }
 }
 
-const updateProfile = async (accessToken, reqBody) => {
+const updateProfile = async (_id, reqBody) => {
   try {
-    const email = jwt.verify(accessToken, env.JWT_SECRET).email
-    if (!email)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token không hợp lệ')
-    const updatedUser = await userModel.updateProfile(reqBody)
+    const updatedUser = await userModel.updateProfile(_id, reqBody)
     return {
       message: 'Cập nhật thông tin thành công',
       data: {
@@ -248,18 +244,16 @@ const updateProfile = async (accessToken, reqBody) => {
         email: updatedUser.email,
         phone: updatedUser.phone,
         avatar: updatedUser.avatar,
-        accessToken: updatedUser.token,
+        accessToken: updatedUser.accessToken,
+        refeshToken: updatedUser.refreshToken,
       },
     }
   } catch (error) {
     throw error
   }
 }
-const updateAvatar = async (accessToken, avatar) => {
+const updateAvatar = async (_id, avatar) => {
   try {
-    const email = jwt.verify(accessToken, env.JWT_SECRET).email
-    if (!email)
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Token không hợp lệ')
     const avataBase64 = avatar.buffer.toString('base64')
     const updatedUser = await userModel.updateProfile({
       email: email,
@@ -268,6 +262,27 @@ const updateAvatar = async (accessToken, avatar) => {
     return { message: 'Avatar updated' }
   } catch (error) {
     throw error
+  }
+}
+
+const refreshToken = async (_id, email) => {
+  const accessToken = jwt.sign(
+    { _id: _id, email: email },
+    env.ACCESS_TOKEN_SECRET,
+    { expiresIn: '1d' }
+  )
+  const refreshToken = jwt.sign(
+    { _id: _id, email: email },
+    env.REFRESH_TOKEN_SECRET,
+    { expiresIn: '30d' }
+  )
+  const authUser = await userModel.updateToken(_id, {
+    accessToken,
+    refreshToken,
+  })
+  return {
+    accessToken: authUser.accessToken,
+    refreshToken: authUser.refreshToken,
   }
 }
 
@@ -282,4 +297,5 @@ export const userService = {
   getUser,
   updateProfile,
   updateAvatar,
+  refreshToken,
 }

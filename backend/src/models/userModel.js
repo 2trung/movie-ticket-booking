@@ -1,7 +1,8 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-import { ObjectId } from 'mongodb'
+// import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { red, blue, yellow } from '../utils/defaultAvatar'
+import { ObjectId } from 'mongodb'
 
 const defaultAvatar = [red, blue, yellow]
 const randomAvatar = () => {
@@ -17,7 +18,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   createdAt: Joi.date().timestamp('javascript').default(Date.now()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   isDeleted: Joi.boolean().default(false),
-  token: Joi.string().default(null),
+  accessToken: Joi.string().default(null),
+  refreshToken: Joi.string().default(null),
   avatar: Joi.string().default(null),
 })
 
@@ -45,25 +47,16 @@ const createNew = async (data) => {
   }
 }
 
-const getByIdId = async (id) => {
+const getById = async (_id) => {
   try {
     return await GET_DB()
       .collection(USER_COLLECTION_NAME)
-      .findOne({ _id: new ObjectId(id) })
+      .findOne({ _id: new ObjectId(String(_id)) })
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const getByUserName = async (userName) => {
-  try {
-    return await GET_DB()
-      .collection(USER_COLLECTION_NAME)
-      .findOne({ userName: userName })
-  } catch (error) {
-    throw new Error(error)
-  }
-}
 const getByEmail = async (email) => {
   try {
     return await GET_DB()
@@ -73,13 +66,19 @@ const getByEmail = async (email) => {
     throw new Error(error)
   }
 }
-const updateToken = async (id, token) => {
+
+const updateToken = async (_id, tokens) => {
   try {
     const updatedUser = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: { token: token } },
+        { _id: new ObjectId(String(_id)) },
+        {
+          $set: {
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+          },
+        },
         { returnDocument: 'after' }
       )
     return updatedUser
@@ -87,12 +86,13 @@ const updateToken = async (id, token) => {
     throw new Error(error)
   }
 }
-const changePassword = async (email, newPassword) => {
+
+const changePassword = async (_id, newPassword) => {
   try {
     const updatedUser = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .findOneAndUpdate(
-        { email: email },
+        { _id: new ObjectId(String(_id)) },
         { $set: { password: newPassword } },
         { returnDocument: 'after' }
       )
@@ -102,12 +102,12 @@ const changePassword = async (email, newPassword) => {
   }
 }
 
-const updateProfile = async (data) => {
+const updateProfile = async (_id, data) => {
   try {
     const updatedUser = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .findOneAndUpdate(
-        { email: data.email },
+        { _id: new ObjectId(String(_id)) },
         { $set: data },
         { returnDocument: 'after' }
       )
@@ -120,8 +120,7 @@ export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   createNew,
-  getByIdId,
-  getByUserName,
+  getById,
   getByEmail,
   updateToken,
   changePassword,

@@ -21,9 +21,8 @@ const login = async (req, res, next) => {
 }
 const changePassword = async (req, res, next) => {
   try {
-    const accessToken = req.headers.authorization.split(' ')[1]
     const response = await userService.changePassword(
-      accessToken,
+      req.user._id,
       req.body.oldPassword,
       req.body.newPassword
     )
@@ -70,8 +69,7 @@ const resendOtp = async (req, res, next) => {
 }
 const getUser = async (req, res, next) => {
   try {
-    const accessToken = req.headers.authorization.split(' ')[1]
-    const response = await userService.getUser(accessToken)
+    const response = await userService.getUser(req.user._id)
     res.status(StatusCodes.OK).json(response)
   } catch (error) {
     next(error)
@@ -80,8 +78,7 @@ const getUser = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    const accessToken = req.headers.authorization.split(' ')[1]
-    const response = await userService.updateProfile(accessToken, req.body)
+    const response = await userService.updateProfile(req.user._id, req.body)
     res.status(StatusCodes.OK).json(response)
   } catch (error) {
     next(error)
@@ -90,9 +87,20 @@ const updateProfile = async (req, res, next) => {
 
 const updateAvatar = async (req, res, next) => {
   try {
-    const accessToken = req.headers.authorization.split(' ')[1]
-    const updatedUser = await userService.updateAvatar(accessToken, req.file)
+    const updatedUser = await userService.updateAvatar(req.user._id, req.file)
     res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) {
+    next(error)
+  }
+}
+
+const refreshToken = async (req, res, next) => {
+  try {
+    const response = await userService.refreshToken(
+      req.user._id,
+      req.user.email
+    )
+    res.status(StatusCodes.OK).json(response)
   } catch (error) {
     next(error)
   }
@@ -109,4 +117,5 @@ export const userController = {
   getUser,
   updateProfile,
   updateAvatar,
+  refreshToken,
 }
