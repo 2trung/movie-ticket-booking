@@ -12,7 +12,8 @@ import { userSelector } from '../../redux/reducers/userReducer'
 import { useSelector } from 'react-redux'
 import { removeUser } from '../../redux/reducers/userReducer'
 import { useDispatch } from 'react-redux'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+// import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as SecureStore from 'expo-secure-store'
 
 import ContainerComponent from '../../components/ContainerComponent'
 
@@ -27,7 +28,7 @@ const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
-    await AsyncStorage.clear()
+    await SecureStore.deleteItemAsync('tokens')
     dispatch(removeUser({}))
   }
   const selection = [

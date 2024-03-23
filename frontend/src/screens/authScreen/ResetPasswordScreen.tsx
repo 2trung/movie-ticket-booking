@@ -20,25 +20,30 @@ const ResetPasswordScreen = ({ navigation }) => {
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword)
 
+  const [loading, setLoading] = useState(false)
+
   const handleChangePassword = async () => {
-    const user = await AsyncStorage.getItem('user')
+    setLoading(true)
+    const user = await AsyncStorage.getItem('auth')
     const userData = JSON.parse(user || '{}')
 
     if (password !== confirmPassword) {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Mật khẩu không khớp',
       })
     }
     if (password.length < 6) {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Mật khẩu phải có ít nhất 6 ký tự',
       })
     }
-
     await resetPasswordAPI(userData.email, password, confirmPassword)
       .then((res) => {
+        setLoading(false)
         Toast.show({
           type: 'success',
           text1: res.message,
@@ -49,6 +54,7 @@ const ResetPasswordScreen = ({ navigation }) => {
         }, 2000)
       })
       .catch((err) => {
+        setLoading(false)
         Toast.show({
           type: 'error',
           text1: err.response.data.message,
@@ -131,6 +137,7 @@ const ResetPasswordScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
+          loading={loading}
           onPress={() => handleChangePassword()}
         >
           Xác nhận

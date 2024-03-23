@@ -8,7 +8,7 @@ import { isValidateEmail } from '../../utils/emailValidate'
 
 import { useDispatch } from 'react-redux'
 import { addUser } from '../../redux/reducers/userReducer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { setItemAsync, getItemAsync } from 'expo-secure-store'
 
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
@@ -20,32 +20,41 @@ const LoginScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false)
   const toggleShowPassword = () => setShowPassword(!showPassword)
 
+  const [loading, setLoading] = useState(false)
+
   const dispatch = useDispatch()
 
   const handleLogin = async () => {
+    setLoading(true)
     if (email === '' || password === '') {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Vui lòng điền đầy đủ thông tin',
       })
     }
 
-    if (!isValidateEmail(email))
+    if (!isValidateEmail(email)) {
+      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Email không hợp lệ',
       })
-
+    }
     await loginAPI(email, password)
       .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
+        setLoading(false)
         dispatch(addUser(res.data))
-        AsyncStorage.setItem('auth', JSON.stringify(res.data))
+        setItemAsync(
+          'tokens',
+          JSON.stringify({
+            accessToken: res.data.accessToken,
+            refreshToken: res.data.refreshToken,
+          })
+        )
       })
       .catch((err) => {
+        setLoading(false)
         Toast.show({
           type: 'error',
           text1: err.response.data.message,
@@ -116,6 +125,7 @@ const LoginScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
+          loading={loading}
           onPress={() => handleLogin()}
         >
           Đăng nhập

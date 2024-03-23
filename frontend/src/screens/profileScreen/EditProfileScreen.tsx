@@ -57,7 +57,7 @@ const EditProfileScreen = ({ navigation }) => {
   const handleSave = async () => {
     setLoading(true)
     fileAvatar &&
-      (await updateAvatarAPI(user.accessToken, {
+      (await updateAvatarAPI({
         uri: fileAvatar.uri,
         name: fileAvatar.fileName,
         type: fileAvatar.mimeType,
@@ -66,7 +66,7 @@ const EditProfileScreen = ({ navigation }) => {
         .catch((err) => {
           setLoading(false)
         }))
-    await updateProfileAPI(user.accessToken, name, phone, email)
+    await updateProfileAPI(name, phone, email)
       .then((res) => {
         Toast.show({
           type: 'success',
