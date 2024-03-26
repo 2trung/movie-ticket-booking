@@ -1,8 +1,18 @@
 import { RowHorizontal } from 'iconsax-react-native';
 import * as React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView, FlatList } from 'react-native';
+
+
 
 const MovieDetails = () => {
+
+    const [lines, setLines] = useState(3);
+
+    const onTextPress = () => {
+        setLines(lines === 3 ? 0 : 3); 
+      };
+      
     return (
         <SafeAreaView style= {styles.container}>
             <ScrollView style={{}}>
@@ -51,7 +61,7 @@ const MovieDetails = () => {
 
                     <View style={{marginTop: 20,width: '100%'}}>
                         <Text style={styles.bold_text}>Nội Dung</Text>
-                        <Text style={styles.normal_text}>
+                        <Text style={styles.normal_text } numberOfLines = {lines}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
                             Aenean placerat felis at diam hendrerit ornare. 
                             Vestibulum vel diam a justo ornare tristique non mollis ligula. 
@@ -64,6 +74,68 @@ const MovieDetails = () => {
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean placerat felis at diam hendrerit ornare. Vestibulum vel diam a justo ornare tristique non mollis ligula. Mauris feugiat diam urna, at sodales libero condimentum in. Integer egestas pretium purus ac aliquet. Donec fringilla eleifend tortor vitae luctus. Pellentesque dictum massa tincidunt lectus mattis tincidunt. Proin a dapibus diam. Nunc viverra, dolor ut ultricies eleifend, lacus sem posuere sapien, non malesuada metus arcu id erat. Vivamus vitae felis non nisi tristique semper. Nulla a leo id augue suscipit semper.
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean placerat felis at diam hendrerit ornare. Vestibulum vel diam a justo ornare tristique non mollis ligula. Mauris feugiat diam urna, at sodales libero condimentum in. Integer egestas pretium purus ac aliquet. Donec fringilla eleifend tortor vitae luctus. Pellentesque dictum massa tincidunt lectus mattis tincidunt. Proin a dapibus diam. Nunc viverra, dolor ut ultricies eleifend, lacus sem posuere sapien, non malesuada metus arcu id erat. Vivamus vitae felis non nisi tristique semper. Nulla a leo id augue suscipit semper.
                         </Text>
+                        <TouchableOpacity onPress={onTextPress}>
+                            <Text style={styles.small_bold_text}>{lines === 3 ? 'Xem thêm' : 'Ẩn bớt'}</Text>
+                        </TouchableOpacity>
+
+                        <View style={{marginTop: 20,width: '100%'}}>
+                            <Text style = {styles.bold_text}>Đạo diễn</Text>
+                            <View style={{
+                                marginTop: 10,
+                                width: '50%',
+                                height: 70,
+                                backgroundColor: '#1c1c1c',
+                                borderRadius: 12,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+
+                            }}>
+                                <Image source={require('../../../src/assets/avatar.jpg')} 
+                                style={{
+                                    marginLeft: 15,
+                                    width: 45,
+                                    height: 45,
+                                    borderRadius: 25,
+                                }}/>
+                                <View style ={{marginLeft: 10}}>
+                                    <Text style={styles.normal_text}>Firstname</Text>
+                                    <Text style={styles.normal_text}>Lastname</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={{marginTop: 20,width: '100%'}}>
+                            <Text style = {styles.bold_text}>Đạo diễn</Text>
+                            <FlatList
+                            horizontal
+                            data={}
+                            contentContainerStyle={{paddingRight: 20}}
+                            renderItem={({item, index}) => (
+                                <View style={{
+                                    marginTop: 10,
+                                    width: '50%',
+                                    height: 70,
+                                    backgroundColor: '#1c1c1c',
+                                    borderRadius: 12,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+    
+                                }}>
+                                    <Image source={require('../../../src/assets/avatar.jpg')} 
+                                    style={{
+                                        marginLeft: 15,
+                                        width: 45,
+                                        height: 45,
+                                        borderRadius: 25,
+                                    }}/>
+                                    <View style ={{marginLeft: 10}}>
+                                        <Text style={styles.normal_text}>Firstname</Text>
+                                        <Text style={styles.normal_text}>Lastname</Text>
+                                    </View>
+                                </View>
+                            )}>
+
+                            </FlatList>
+                        </View>
                     </View>
                 </View>
             </ScrollView>
