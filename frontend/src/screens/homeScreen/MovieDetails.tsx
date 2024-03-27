@@ -1,22 +1,42 @@
 import { RowHorizontal } from 'iconsax-react-native';
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity, ScrollView, SafeAreaView, FlatList } from 'react-native';
+import { getMovieDetailsAPI } from '../../apis';
 
 
 
 const MovieDetails = () => {
+    const [movieDetails, setMovieDetails] = useState<any>(null);
+    useEffect(() => {
+        const fetchMovieDetails = async () => {
+            try {
+                const response = await getMovieDetailsAPI('66010ef6d82009222e7c29dd');
+                setMovieDetails(response.data);
+            } catch (error) {
+                console.error('Error fetching movie details:', error);
+            }
+        };
 
+        fetchMovieDetails();
+    }, []);
+    
+    // Date processing
+    const rawDate = new Date(movieDetails?.data.movie.releaseDate);
+    const releaseDate = `${rawDate.getDate().toString().padStart(2, '0')}/${(rawDate.getMonth() + 1).toString().padStart(2, '0')}/${rawDate.getFullYear().toString().slice(-2)}`;
+
+    // Read more/less
     const [lines, setLines] = useState(3);
-
     const onTextPress = () => {
         setLines(lines === 3 ? 0 : 3); 
       };
-      
+    
+    const genresArray = movieDetails?.data.movie.genres;
+    const genresString = genresArray?.join(', ');
     return (
         <SafeAreaView style= {styles.container}>
             <ScrollView style={{}}>
-                <Image style={styles.cover} source={require('../../../src/assets/dune.jpg')}/>
+                <Image style={styles.cover} source={{uri : movieDetails.data.movie.poster}}/>
                 <View style={styles.main_frame}>
                     <View style={styles.general_info}>
                         <View style={{
@@ -26,14 +46,14 @@ const MovieDetails = () => {
                             height: 50,
                             alignItems: 'flex-start',
                         }}>
-                            <Text style={styles.bold_text}>Movie Name</Text>
-                            <Text style={{fontSize: 12, fontWeight: '400', color: '#737373'}}>Duration . release date</Text>
+                            <Text style={styles.bold_text}>{movieDetails.data.movie.title}</Text>
+                            <Text style={{fontSize: 12, fontWeight: '400', color: '#737373'}}>{movieDetails.data.movie.duration} Phút • releaseDate</Text>
                         </View>
                         <View style={{marginTop: 26}}>
                             <View style={{marginLeft:30, flexDirection: 'row', alignItems: 'flex-start'}}>
                                 <Text style={styles.small_bold_text}>Review </Text>
-                                <Text style={styles.small_bold_text}>3.6*</Text>
-                                <Text style={{fontSize: 12, fontWeight: '300', color: '#737373', marginLeft: 5}}>(1000)</Text>
+                                <Text style={styles.small_bold_text}>{movieDetails.data.movie.rating}</Text>
+                                <Text style={{fontSize: 12, fontWeight: '300', color: '#737373', marginLeft: 5}}>({movieDetails.data.movie.rating_count})</Text>
                             </View>
                             <View style={{marginHorizontal:30 ,flexDirection: 'row',}}>
                                 <View style={{backgroundColor: 'white', width: 200, height: 32}}></View>
@@ -47,32 +67,18 @@ const MovieDetails = () => {
                     <View style= {{justifyContent: 'space-between', marginTop: 10}}>
                         <View style= {{marginTop: 15, flexDirection: 'row'}}>
                             <Text style= {styles.normal_text}>Thể loại: </Text>
-                            <Text style= {styles.small_bold_text}>Hành cmn động, phiêu lưu vl </Text>
+                            <Text style= {styles.small_bold_text}>{genresString}</Text>
                         </View>
                         <View style= {{marginTop: 15, flexDirection: 'row'}}>
                             <Text style= {styles.normal_text}>Giới hạn độ tuổi: </Text>
-                            <Text style= {styles.small_bold_text}>Thích thì xem, thanh tra đến thì chạy</Text>
-                        </View>
-                        <View style= {{marginTop: 15, flexDirection: 'row'}}>
-                            <Text style= {styles.normal_text}>Ngôn ngữ: </Text>
-                            <Text style= {styles.small_bold_text}>Nhìn là dc rồi ko cần hiểu</Text>
+                            <Text style= {styles.small_bold_text}>{movieDetails.data.movie.cens}</Text>
                         </View>
                     </View>
 
                     <View style={{marginTop: 20,width: '100%'}}>
                         <Text style={styles.bold_text}>Nội Dung</Text>
                         <Text style={styles.normal_text } numberOfLines = {lines}>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                            Aenean placerat felis at diam hendrerit ornare. 
-                            Vestibulum vel diam a justo ornare tristique non mollis ligula. 
-                            Mauris feugiat diam urna, at sodales libero condimentum in. 
-                            Integer egestas pretium purus ac aliquet. 
-                            Donec fringilla eleifend tortor vitae luctus. 
-                            Pellentesque dictum massa tincidunt lectus mattis tincidunt. 
-                            Proin a dapibus diam. Nunc viverra, dolor ut ultricies eleifend, lacus sem posuere sapien, 
-                            non malesuada metus arcu id erat. Vivamus vitae felis non nisi tristique semper. Nulla a leo id augue suscipit semper.
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean placerat felis at diam hendrerit ornare. Vestibulum vel diam a justo ornare tristique non mollis ligula. Mauris feugiat diam urna, at sodales libero condimentum in. Integer egestas pretium purus ac aliquet. Donec fringilla eleifend tortor vitae luctus. Pellentesque dictum massa tincidunt lectus mattis tincidunt. Proin a dapibus diam. Nunc viverra, dolor ut ultricies eleifend, lacus sem posuere sapien, non malesuada metus arcu id erat. Vivamus vitae felis non nisi tristique semper. Nulla a leo id augue suscipit semper.
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean placerat felis at diam hendrerit ornare. Vestibulum vel diam a justo ornare tristique non mollis ligula. Mauris feugiat diam urna, at sodales libero condimentum in. Integer egestas pretium purus ac aliquet. Donec fringilla eleifend tortor vitae luctus. Pellentesque dictum massa tincidunt lectus mattis tincidunt. Proin a dapibus diam. Nunc viverra, dolor ut ultricies eleifend, lacus sem posuere sapien, non malesuada metus arcu id erat. Vivamus vitae felis non nisi tristique semper. Nulla a leo id augue suscipit semper.
+                            {movieDetails.data.movie.description}
                         </Text>
                         <TouchableOpacity onPress={onTextPress}>
                             <Text style={styles.small_bold_text}>{lines === 3 ? 'Xem thêm' : 'Ẩn bớt'}</Text>
@@ -90,7 +96,7 @@ const MovieDetails = () => {
                                 alignItems: 'center',
 
                             }}>
-                                <Image source={require('../../../src/assets/avatar.jpg')} 
+                                <Image source={{uri : movieDetails.data.movie.director.photo}} 
                                 style={{
                                     marginLeft: 15,
                                     width: 45,
@@ -107,7 +113,7 @@ const MovieDetails = () => {
                             <Text style = {styles.bold_text}>Đạo diễn</Text>
                             <FlatList
                             horizontal
-                            data={}
+                            data={[1,2,3,4,5,6,7,8,9,10]}
                             contentContainerStyle={{paddingRight: 20}}
                             renderItem={({item, index}) => (
                                 <View style={{
@@ -133,7 +139,6 @@ const MovieDetails = () => {
                                     </View>
                                 </View>
                             )}>
-
                             </FlatList>
                         </View>
                     </View>
