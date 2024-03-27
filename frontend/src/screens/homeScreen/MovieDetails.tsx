@@ -19,10 +19,11 @@ const MovieDetails = () => {
         };
 
         fetchMovieDetails();
+        
     }, []);
-    
+    console.log(movieDetails);
     // Date processing
-    const rawDate = new Date(movieDetails?.data.movie.releaseDate);
+    const rawDate = new Date(movieDetails?.movie.releaseDate);
     const releaseDate = `${rawDate.getDate().toString().padStart(2, '0')}/${(rawDate.getMonth() + 1).toString().padStart(2, '0')}/${rawDate.getFullYear().toString().slice(-2)}`;
 
     // Read more/less
@@ -31,12 +32,13 @@ const MovieDetails = () => {
         setLines(lines === 3 ? 0 : 3); 
       };
     
-    const genresArray = movieDetails?.data.movie.genres;
+    const genresArray = movieDetails?.movie.genres;
     const genresString = genresArray?.join(', ');
+
     return (
         <SafeAreaView style= {styles.container}>
             <ScrollView style={{}}>
-                <Image style={styles.cover} source={{uri : movieDetails.data.movie.poster}}/>
+                <Image style={styles.cover} source={{uri : movieDetails.movie.poster}}/>
                 <View style={styles.main_frame}>
                     <View style={styles.general_info}>
                         <View style={{
@@ -46,14 +48,14 @@ const MovieDetails = () => {
                             height: 50,
                             alignItems: 'flex-start',
                         }}>
-                            <Text style={styles.bold_text}>{movieDetails.data.movie.title}</Text>
-                            <Text style={{fontSize: 12, fontWeight: '400', color: '#737373'}}>{movieDetails.data.movie.duration} Phút • releaseDate</Text>
+                            <Text style={styles.bold_text}>{movieDetails.movie.title}</Text>
+                            <Text style={{fontSize: 12, fontWeight: '400', color: '#737373'}}>{movieDetails.movie.duration} Phút • {releaseDate}</Text>
                         </View>
                         <View style={{marginTop: 26}}>
                             <View style={{marginLeft:30, flexDirection: 'row', alignItems: 'flex-start'}}>
                                 <Text style={styles.small_bold_text}>Review </Text>
-                                <Text style={styles.small_bold_text}>{movieDetails.data.movie.rating}</Text>
-                                <Text style={{fontSize: 12, fontWeight: '300', color: '#737373', marginLeft: 5}}>({movieDetails.data.movie.rating_count})</Text>
+                                <Text style={styles.small_bold_text}>{movieDetails.movie.rating}</Text>
+                                <Text style={{fontSize: 12, fontWeight: '300', color: '#737373', marginLeft: 5}}>({movieDetails.movie.rating_count})</Text>
                             </View>
                             <View style={{marginHorizontal:30 ,flexDirection: 'row',}}>
                                 <View style={{backgroundColor: 'white', width: 200, height: 32}}></View>
@@ -71,14 +73,14 @@ const MovieDetails = () => {
                         </View>
                         <View style= {{marginTop: 15, flexDirection: 'row'}}>
                             <Text style= {styles.normal_text}>Giới hạn độ tuổi: </Text>
-                            <Text style= {styles.small_bold_text}>{movieDetails.data.movie.cens}</Text>
+                            <Text style= {styles.small_bold_text}>{movieDetails.movie.cens}</Text>
                         </View>
                     </View>
 
                     <View style={{marginTop: 20,width: '100%'}}>
                         <Text style={styles.bold_text}>Nội Dung</Text>
                         <Text style={styles.normal_text } numberOfLines = {lines}>
-                            {movieDetails.data.movie.description}
+                            {movieDetails.movie.description}
                         </Text>
                         <TouchableOpacity onPress={onTextPress}>
                             <Text style={styles.small_bold_text}>{lines === 3 ? 'Xem thêm' : 'Ẩn bớt'}</Text>
@@ -96,7 +98,7 @@ const MovieDetails = () => {
                                 alignItems: 'center',
 
                             }}>
-                                <Image source={{uri : movieDetails.data.movie.director.photo}} 
+                                <Image source={{uri : movieDetails.movie.director.photo}} 
                                 style={{
                                     marginLeft: 15,
                                     width: 45,
@@ -104,16 +106,16 @@ const MovieDetails = () => {
                                     borderRadius: 25,
                                 }}/>
                                 <View style ={{marginLeft: 10}}>
-                                    <Text style={styles.normal_text}>Firstname</Text>
+                                    <Text style={styles.normal_text}>{movieDetails.movie.director.name}</Text>
                                     <Text style={styles.normal_text}>Lastname</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={{marginTop: 20,width: '100%'}}>
-                            <Text style = {styles.bold_text}>Đạo diễn</Text>
+                            <Text style = {styles.bold_text}>Diễn viên</Text>
                             <FlatList
                             horizontal
-                            data={[1,2,3,4,5,6,7,8,9,10]}
+                            data={movieDetails.movie.cast}
                             contentContainerStyle={{paddingRight: 20}}
                             renderItem={({item, index}) => (
                                 <View style={{

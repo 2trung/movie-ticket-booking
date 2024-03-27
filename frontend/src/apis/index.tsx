@@ -88,5 +88,5 @@ export const changePasswordAPI = async (
 
 export const getMovieDetailsAPI = async (movieId) => {
   const response = await axios.get(`${API_ROOT}/movie?movieId=${movieId}`)
-  return response
+  return response.data
 }
