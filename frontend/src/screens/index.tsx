@@ -7,6 +7,7 @@ import VerificationScreen from './authScreen/VerificationScreen'
 import ResetPasswordScreen from './authScreen/ResetPasswordScreen'
 
 import HomeScreen from './homeScreen/HomeScreen'
+import MovieDetails from './homeScreen/MovieDetails'
 
 import ProfileScreen from './profileScreen/ProfileScreen'
 import EditProfileScreen from './profileScreen/EditProfileScreen'
@@ -24,4 +25,5 @@ export {
   ProfileScreen,
   EditProfileScreen,
   ChangePasswordScreen,
+  MovieDetails,
 }
