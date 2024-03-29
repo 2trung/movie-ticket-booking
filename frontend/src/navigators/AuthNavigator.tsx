@@ -6,6 +6,7 @@ import {
   ForgotPasswordScreen,
   VerificationScreen,
   ResetPasswordScreen,
+  SelectSeatScreen,
 } from '../screens/index'
 import OnbroadingScreen from '../screens/authScreen/OnbroadingScreen'
 
@@ -16,8 +17,10 @@ const AuthNavigator = () => {
       screenOptions={{
         headerShown: false,
       }}
+      initialRouteName='SelectSeatScreen'
     >
-      <Stack.Screen name='OnbroadingScreen' component={OnbroadingScreen} />
+      <Stack.Screen name ='selectSeatScreen' component={SelectSeatScreen}/>
+      {/* <Stack.Screen name='OnbroadingScreen' component={OnbroadingScreen} /> */}
       <Stack.Screen name='LoginScreen' component={LoginScreen} />
       <Stack.Screen name='RegisterScreen' component={RegisterScreen} />
       <Stack.Screen name='VerificationScreen' component={VerificationScreen} />

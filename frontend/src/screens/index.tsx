@@ -12,6 +12,7 @@ import MovieDetails from './homeScreen/MovieDetails'
 import ProfileScreen from './profileScreen/ProfileScreen'
 import EditProfileScreen from './profileScreen/EditProfileScreen'
 import ChangePasswordScreen from './profileScreen/ChangePasswordScreen'
+import SelectSeatScreen from './selectSeatScreen/selectSeatScreen'
 
 export {
   LoginScreen,
@@ -25,5 +26,6 @@ export {
   ProfileScreen,
   EditProfileScreen,
   ChangePasswordScreen,
+  SelectSeatScreen,
   MovieDetails,
 }
