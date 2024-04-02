@@ -7,7 +7,7 @@ import Toast from 'react-native-toast-message'
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
 
-import { changePasswordAPI } from '../../apis'
+import { changePasswordAPI } from '../../apis/userApi'
 import { AntDesign } from '@expo/vector-icons'
 
 const ChanegPasswordScreen = ({ navigation }) => {

@@ -1,13 +1,15 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { resetPasswordAPI } from '../../apis'
+import { resetPasswordAPI } from '../../apis/userApi'
 import CustomHeader from '../../components/CustomHeader'
 import ContainerComponent from '../../components/ContainerComponent'
+
+import { AntDesign } from '@expo/vector-icons'
 
 const ResetPasswordScreen = ({ navigation }) => {
   const [password, setPassword] = useState('')
@@ -64,18 +66,12 @@ const ResetPasswordScreen = ({ navigation }) => {
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
-          style={{
-            position: 'absolute',
-            left: '5%',
-            top: 0,
-          }}
-          textColor='#fff'
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={36} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader
           text='Đặt lại mật khẩu'
           variant='title'

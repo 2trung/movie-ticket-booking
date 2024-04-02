@@ -36,7 +36,9 @@ const ProfileScreen = ({ navigation }) => {
       label: 'Vé của tôi',
       icon: <Fontisto name='ticket-alt' size={32} color='#fff' />,
       isLast: false,
-      handle: () => {},
+      handle: () => {
+        navigation.navigate('TicketsScreen')
+      },
     },
     {
       label: 'Lịch sử đơn hàng',

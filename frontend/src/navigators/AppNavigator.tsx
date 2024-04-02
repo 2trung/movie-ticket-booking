@@ -4,12 +4,10 @@ import { addUser, userSelector } from '../redux/reducers/userReducer'
 import AuthNavigator from './AuthNavigator'
 import MainNavigator from './MainNavigator'
 import { SplashScreen } from '../screens'
-import { getUserAPI } from '../apis'
+import { getUserAPI } from '../apis/userApi'
 
 const AppRouters = () => {
   const [isShowSplash, setIsShowSplash] = useState(true)
-
-  // const { setItem } = useAsyncStorage('auth')
 
   const user = useSelector(userSelector)
   const dispatch = useDispatch()
@@ -21,15 +19,6 @@ const AppRouters = () => {
     }
   }, [user])
 
-  useEffect(() => {
-    checkLogin()
-    setAccessToken(user.accessToken)
-    const timeout = setTimeout(() => {
-      setIsShowSplash(false)
-    }, 1500)
-    return () => clearTimeout(timeout)
-  }, [])
-
   const checkLogin = async () => {
     try {
       const response = await getUserAPI()
@@ -39,6 +28,15 @@ const AppRouters = () => {
       setIsShowSplash(false)
     }
   }
+
+  useEffect(() => {
+    checkLogin()
+    setAccessToken(user.accessToken)
+    const timeout = setTimeout(() => {
+      setIsShowSplash(false)
+    }, 1500)
+    return () => clearTimeout(timeout)
+  }, [])
 
   return (
     <>

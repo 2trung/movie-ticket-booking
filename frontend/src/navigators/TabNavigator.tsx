@@ -1,10 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Platform } from 'react-native'
-//HomeNavigator
-import { HomeScreen } from '../screens'
+
+import { HomeScreen, TicketsScreen, MovieScreen } from '../screens'
 import ProfileNavigator from './ProfileNavigator'
 
-import { Feather } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 const TabNavigator = () => {
   const Tab = createBottomTabNavigator()
@@ -25,22 +26,40 @@ const TabNavigator = () => {
           size = 24
           switch (route.name) {
             case 'Home':
-              icon = (
-                <Feather
-                  name='home'
+              icon = focused ? (
+                <Ionicons name='home-sharp' size={24} color={'#FCC434'} />
+              ) : (
+                <Ionicons name='home-outline' size={24} color={'#fff'} />
+              )
+              break
+            case 'TicketsScreen':
+              icon = focused ? (
+                <MaterialCommunityIcons
+                  name='ticket-confirmation'
                   size={24}
-                  color={focused ? '#FCC434' : '#fff'}
+                  color='#FCC434'
                 />
+              ) : (
+                <MaterialCommunityIcons
+                  name='ticket-confirmation-outline'
+                  size={24}
+                  color='#fff'
+                />
+              )
+              break
+            case 'MovieScreen':
+              icon = focused ? (
+                <Ionicons name='videocam' size={24} color='#FCC434' />
+              ) : (
+                <Ionicons name='videocam-outline' size={24} color='#fff' />
               )
               break
 
             case 'ProfileNavigator':
-              icon = (
-                <Feather
-                  name='user'
-                  size={24}
-                  color={focused ? '#FCC434' : '#fff'}
-                />
+              icon = focused ? (
+                <Ionicons name='person' size={24} color={'#FCC434'} />
+              ) : (
+                <Ionicons name='person-outline' size={24} color={'#fff'} />
               )
               break
           }
@@ -63,6 +82,17 @@ const TabNavigator = () => {
         options={{ tabBarLabel: 'Trang chủ' }}
         component={HomeScreen}
       />
+      <Tab.Screen
+        name='TicketsScreen'
+        options={{ tabBarLabel: 'Vé của tôi' }}
+        component={TicketsScreen}
+      />
+      <Tab.Screen
+        name='MovieScreen'
+        options={{ tabBarLabel: 'Phim' }}
+        component={MovieScreen}
+      />
+
       <Tab.Screen
         name='ProfileNavigator'
         options={{ tabBarLabel: 'Hồ sơ' }}

@@ -7,7 +7,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
-import { verifyOtpAPI, resendOtpAPI } from '../../apis'
+import { verifyOtpAPI, resendOtpAPI } from '../../apis/userApi'
+
+import { AntDesign } from '@expo/vector-icons'
 
 const VerificationScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -96,14 +98,12 @@ const VerificationScreen = ({ navigation }) => {
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
+        <TouchableOpacity
           style={styles.backButton}
-          textColor='#fff'
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={36} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader text='Xác thực OTP' variant='title' />
         <CustomHeader text='Mã OTP đã được gửi đến email' variant='body2' />
         <CustomHeader
