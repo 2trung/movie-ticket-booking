@@ -6,6 +6,7 @@ import {
   Keyboard,
   Platform,
   KeyboardAvoidingView,
+  View,
 } from 'react-native'
 
 const ContainerComponent = ({ children }) => {
@@ -18,6 +19,7 @@ const ContainerComponent = ({ children }) => {
       <SafeAreaView
         style={{
           paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+          // paddingTop: insets.top,
           flex: 1,
         }}
       >

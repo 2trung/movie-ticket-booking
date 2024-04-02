@@ -3,18 +3,14 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { useState } from 'react'
 
 import Toast from 'react-native-toast-message'
-import { useSelector } from 'react-redux'
-import { userSelector } from '../../redux/reducers/userReducer'
 
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
 
-import { changePasswordAPI } from '../../apis'
+import { changePasswordAPI } from '../../apis/userApi'
 import { AntDesign } from '@expo/vector-icons'
 
 const ChanegPasswordScreen = ({ navigation }) => {
-  const user = useSelector(userSelector)
-
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
@@ -55,12 +51,7 @@ const ChanegPasswordScreen = ({ navigation }) => {
         text1: 'Mật khẩu không khớp',
       })
     }
-    await changePasswordAPI(
-      user.accessToken,
-      oldPassword,
-      newPassword,
-      confirmNewPassword
-    )
+    await changePasswordAPI(oldPassword, newPassword, confirmNewPassword)
       .then((res) => {
         setLoading(false)
         return Toast.show({

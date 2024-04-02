@@ -1,13 +1,15 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 
 import { isValidateEmail } from '../../utils/emailValidate'
-import { registerAPI } from '../../apis'
+import { registerAPI } from '../../apis/userApi'
 
 import CustomHeader from '../../components/CustomHeader'
 import ContainerComponent from '../../components/ContainerComponent'
+
+import { AntDesign } from '@expo/vector-icons'
 
 const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -66,14 +68,12 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
+        <TouchableOpacity
           style={styles.backButton}
-          textColor='#fff'
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={36} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader
           text='Đăng ký'
           variant='title'

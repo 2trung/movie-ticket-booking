@@ -7,7 +7,7 @@ import {
   VerificationScreen,
   ResetPasswordScreen,
 } from '../screens/index'
-import OnbroadingScreen from '../screens/authScreen/OnbroadingScreen'
+import OnboardingScreen from '../screens/OnboardingScreen'
 
 const AuthNavigator = () => {
   const Stack = createNativeStackNavigator()
@@ -17,7 +17,7 @@ const AuthNavigator = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name='OnbroadingScreen' component={OnbroadingScreen} />
+      <Stack.Screen name='OnboardingScreen' component={OnboardingScreen} />
       <Stack.Screen name='LoginScreen' component={LoginScreen} />
       <Stack.Screen name='RegisterScreen' component={RegisterScreen} />
       <Stack.Screen name='VerificationScreen' component={VerificationScreen} />

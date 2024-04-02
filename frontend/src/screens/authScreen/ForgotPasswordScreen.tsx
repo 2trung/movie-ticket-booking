@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 import { useState } from 'react'
@@ -11,7 +11,9 @@ import { addUser } from '../../redux/reducers/userReducer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { isValidateEmail } from '../../utils/emailValidate'
-import { forgetPasswordAPI } from '../../apis'
+import { forgetPasswordAPI } from '../../apis/userApi'
+
+import { AntDesign } from '@expo/vector-icons'
 
 const ForgotPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -41,14 +43,12 @@ const ForgotPasswordScreen = ({ navigation }) => {
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
+        <TouchableOpacity
           style={styles.backButton}
-          textColor='#fff'
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={36} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader text='Đặt lại mật khẩu' variant='title' />
         <CustomHeader
           text='Hãy nhập địa chỉ Email của bạn'

@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addUser, userSelector } from '../../redux/reducers/userReducer'
 import { useEffect, useState } from 'react'
 
-import { updateProfileAPI, updateAvatarAPI } from '../../apis'
+import { updateProfileAPI, updateAvatarAPI } from '../../apis/userApi'
 import ContainerComponent from '../../components/ContainerComponent'
 import Toast from 'react-native-toast-message'
 
@@ -45,34 +45,36 @@ const EditProfileScreen = ({ navigation }) => {
         base64: true,
         quality: 1,
       })
-
-      if (!file.canceled) {
-        setAvatar(file.assets[0].base64)
-        setFileAvatar(file.assets[0])
-      }
+      setAvatar(file.assets[0].base64)
+      setFileAvatar(file.assets[0])
     } catch (error) {
-      console.error('Lỗi khi tải lên hình ảnh')
+      return Toast.show({
+        type: 'error',
+        text1: 'Không tìm thấy hình ảnh',
+      })
     }
   }
   const handleSave = async () => {
     setLoading(true)
     fileAvatar &&
-      (await updateAvatarAPI(user.accessToken, {
+      (await updateAvatarAPI({
         uri: fileAvatar.uri,
         name: fileAvatar.fileName,
         type: fileAvatar.mimeType,
       })
-        .then((res) => {})
+        .then((res) => {
+          setLoading(false)
+        })
         .catch((err) => {
           setLoading(false)
         }))
-    await updateProfileAPI(user.accessToken, name, phone, email)
+    await updateProfileAPI(name, phone, email)
       .then((res) => {
-        Toast.show({
+        dispatch(addUser(res.data))
+        return Toast.show({
           type: 'success',
           text1: res.message,
         })
-        dispatch(addUser(res.data))
       })
       .catch((err) => {
         setLoading(false)
@@ -159,10 +161,11 @@ const EditProfileScreen = ({ navigation }) => {
         mode='contained'
         buttonColor='#FCC434'
         textColor='#000'
-        labelStyle={styles.textButton}
-        style={styles.button}
+        labelStyle={styles.buttonLabel}
+        style={styles.saveButton}
         onPress={() => handleSave()}
         loading={loading}
+        // disabled={loading}
       >
         Lưu
       </Button>
@@ -176,12 +179,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '35%',
   },
-  textButton: {
+  buttonLabel: {
     fontSize: 16,
     lineHeight: 30,
     fontWeight: 'bold',
   },
-  button: {
+  saveButton: {
     width: '90%',
     borderRadius: 10,
     margin: 10,

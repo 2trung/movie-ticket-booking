@@ -1,6 +1,6 @@
 import LoginScreen from './authScreen/LoginScreen'
 import RegisterScreen from './authScreen/RegisterScreen'
-import OnbroadingScreen from './authScreen/OnbroadingScreen'
+import OnboardingScreen from './OnboardingScreen'
 import SplashScreen from './SplashScreen'
 import ForgotPasswordScreen from './authScreen/ForgotPasswordScreen'
 import VerificationScreen from './authScreen/VerificationScreen'
@@ -12,10 +12,19 @@ import ProfileScreen from './profileScreen/ProfileScreen'
 import EditProfileScreen from './profileScreen/EditProfileScreen'
 import ChangePasswordScreen from './profileScreen/ChangePasswordScreen'
 
+import TicketDetailScreen from './orderScreen/TicketDetailScreen'
+import TicketsScreen from './orderScreen/TicketsScreen'
+
+import MovieScreen from './movieScreen/MovieScreen'
+import MovieDetailScreen from './movieScreen/MovieDetailScreen'
+
+import PaymentScreen from './orderScreen/PaymentScreen'
+import SelectSeatScreen from './orderScreen/SelectSeatScreen'
+
 export {
   LoginScreen,
   RegisterScreen,
-  OnbroadingScreen,
+  OnboardingScreen,
   SplashScreen,
   ForgotPasswordScreen,
   VerificationScreen,
@@ -24,4 +33,10 @@ export {
   ProfileScreen,
   EditProfileScreen,
   ChangePasswordScreen,
+  TicketDetailScreen,
+  TicketsScreen,
+  MovieScreen,
+  PaymentScreen,
+  MovieDetailScreen,
+  SelectSeatScreen,
 }

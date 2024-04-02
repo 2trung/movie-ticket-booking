@@ -1,21 +1,41 @@
-import { FlatList, Image, View, Dimensions, StyleSheet } from 'react-native'
+import {
+  FlatList,
+  Image,
+  View,
+  Dimensions,
+  StyleSheet,
+  Text,
+  Pressable,
+} from 'react-native'
 import { useEffect, useRef, useState } from 'react'
 
-const Carousel = () => {
-  const DATA = [
-    {
-      id: '01',
-      image: require('../assets/dune.jpg'),
-    },
-    {
-      id: '02',
-      image: require('../assets/spiderman.jpg'),
-    },
-    {
-      id: '03',
-      image: require('../assets/topgun.jpg'),
-    },
-  ]
+import CustomHeader from './CustomHeader'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
+
+interface movie {
+  _id: string
+  title: string
+  description: string
+  releaseDate: string
+  duration: number
+  genres: Array<string>
+  cast: Array<string>
+  director: string
+  trailer: string
+  cens: string
+  poster: string
+  rating: number
+  rating_count: string
+}
+
+interface ContainerComponentProps {
+  data: Array<movie>
+  navigation: any
+}
+const WIDTH = Dimensions.get('window').width
+const PADDING = (WIDTH - 300) / 2
+const Carousel: React.FC<ContainerComponentProps> = ({ data, navigation }) => {
   const onViewableItemsChanged = ({ viewableItems }: any) => {
     const currentIndex = viewableItems[0]?.index
     if (currentIndex !== undefined) {
@@ -35,48 +55,82 @@ const Carousel = () => {
 
   const flatListRef = useRef(null)
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      if (activeIndex === DATA.length - 1) {
-        flatListRef.current.scrollToIndex({ index: 0 })
-      } else {
-        flatListRef.current.scrollToIndex({ index: activeIndex + 1 })
-      }
-    }, 3000)
-    return () => {
-      clearTimeout(timerId)
-    }
-  }, [activeIndex])
-
   return (
     <View style={{ alignItems: 'center' }}>
       <FlatList
         ref={flatListRef}
-        data={DATA}
+        data={data}
         horizontal
+        snapToOffsets={[...Array(data.length).keys()].map(
+          (i) => i * (WIDTH * 0.8 - 40) + (i - 1) * 50 + PADDING
+        )}
+        snapToAlignment='start'
+        scrollEventThrottle={16}
+        decelerationRate='fast'
+        showsHorizontalScrollIndicator={false}
+        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
+        contentContainerStyle={{
+          paddingHorizontal: (WIDTH - 300) / 2 - 10,
+        }}
+        renderToHardwareTextureAndroid={true}
+        ItemSeparatorComponent={() => (
+          <View style={{ width: 10, backgroundColor: 'transparent' }} />
+        )}
         renderItem={({ item, index }) => (
-          <View
-            style={{
-              width: Dimensions.get('window').width,
-            }}
+          <Pressable
+            style={{ width: WIDTH * 0.8 - 20, marginHorizontal: 10 }}
+            onPress={() =>
+              navigation.navigate('MovieDetailScreen', {
+                movieId: item._id,
+              })
+            }
           >
             <Image
-              source={item.image}
+              source={{ uri: item.poster }}
               resizeMode='cover'
               style={styles.image}
             />
-          </View>
+            <View style={{ alignItems: 'center', marginTop: 10 }}>
+              <Text numberOfLines={1} style={styles.heading2}>
+                {item.title}
+              </Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={{ color: '#BFBFBF', alignSelf: 'center' }}>
+                  {item.duration > 60
+                    ? `${Math.floor(item.duration / 60)}h${
+                        item.duration % 60 !== 0 ? `${item.duration % 60}m` : ''
+                      }`
+                    : `${item.duration}m`}
+                </Text>
+                <Text style={{ color: '#BFBFBF' }}>•</Text>
+                <Text style={{ color: '#BFBFBF' }}>
+                  {item.genres.join(', ')}
+                </Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialCommunityIcons name='star' size={20} color='#FCC434' />
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    marginHorizontal: 5,
+                  }}
+                >
+                  {item.rating}
+                </Text>
+                <Text style={{ color: '#BFBFBF' }}>({item.rating_count})</Text>
+              </View>
+            </View>
+          </Pressable>
         )}
-        pagingEnabled
-        keyExtractor={(item, index) => index.toString()}
-        showsHorizontalScrollIndicator={false}
-        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
       />
+
       <FlatList
-        data={DATA}
+        data={data}
         horizontal
         scrollEnabled={false}
-        style={{ position: 'relative', paddingTop: 20 }}
+        style={{ position: 'relative', paddingTop: 10 }}
         renderItem={({ item, index }) => (
           <View
             style={[
@@ -95,7 +149,7 @@ const Carousel = () => {
 const styles = StyleSheet.create({
   image: {
     width: 300,
-    height: 300,
+    height: 450,
     alignSelf: 'center',
     borderRadius: 20,
   },
@@ -104,6 +158,12 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     marginHorizontal: 2,
+  },
+  heading2: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    lineHeight: 30,
   },
 })
 
