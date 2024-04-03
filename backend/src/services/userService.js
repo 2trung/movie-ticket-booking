@@ -61,7 +61,7 @@ const signUp = async (reqBody) => {
       email: reqBody.email,
       password: hashPassword,
     })
-    const newUser = await userModel.getByIdId(createdUser.insertedId)
+    const newUser = await userModel.getById(createdUser.insertedId)
     return {
       message: 'Đăng ký thành công',
       data: { _id: newUser._id, email: newUser.email },
@@ -236,7 +236,10 @@ const resetPassword = async (email, newPassword) => {
 
 const updateProfile = async (_id, reqBody) => {
   try {
-    const updatedUser = await userModel.updateProfile(_id, reqBody)
+    const updatedUser = await userModel.updateProfile(_id, {
+      ...reqBody,
+      updatedAt: Date.now(),
+    })
     return {
       message: 'Cập nhật thông tin thành công',
       data: {
@@ -255,9 +258,9 @@ const updateProfile = async (_id, reqBody) => {
 const updateAvatar = async (_id, avatar) => {
   try {
     const avataBase64 = avatar.buffer.toString('base64')
-    const updatedUser = await userModel.updateProfile({
-      email: email,
+    const updatedUser = await userModel.updateProfile(_id, {
       avatar: avataBase64,
+      updatedAt: Date.now(),
     })
     return { message: 'Avatar updated' }
   } catch (error) {

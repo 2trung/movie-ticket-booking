@@ -23,7 +23,12 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   avatar: Joi.string().default(null),
 })
 
-const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'token']
+const INVALID_UPDATE_FIELDS = [
+  '_id',
+  'createdAt',
+  'accessToken',
+  'refreshToken',
+]
 
 const validateBeforeCreate = async (data) => {
   return await USER_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })

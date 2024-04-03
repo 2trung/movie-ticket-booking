@@ -12,7 +12,7 @@ import {
 import { useState, useEffect } from 'react'
 import { getMovieDetailAPI } from '../../apis/movieApi'
 import { AntDesign, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons'
-import ContainerComponent from '../../components/ContainerComponent'
+import FetchingApi from '../../components/FetchingApi'
 import CustomHeader from '../../components/CustomHeader'
 import { RouteProp } from '@react-navigation/native'
 
@@ -44,6 +44,7 @@ interface MovieDetailProps {
   poster: string
   rating: number
   rating_count: string
+  isPlaying: boolean
 }
 
 const formatDuration = (duration: number) => {
@@ -63,16 +64,21 @@ const MovieDetailScreen = ({ route, navigation }) => {
   useEffect(() => {
     getMovieDetailAPI(route?.params?.movieId)
       .then((res) => {
-        setMovieDetail(res.data.movie)
+        setMovieDetail(res.data)
       })
       .catch((err) => {
         console.log(err)
       })
   }, [])
   const [showMore, setShowMore] = useState(false)
-  if (!movieDetail) return null
+  if (!movieDetail) return <FetchingApi />
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...styles.container,
+        paddingBottom: movieDetail.isPlaying ? 100 : 0,
+      }}
+    >
       <ScrollView style={{ flex: 1 }}>
         <TouchableOpacity
           style={styles.backButton}
@@ -223,14 +229,16 @@ const MovieDetailScreen = ({ route, navigation }) => {
           </ScrollView>
         </View>
       </ScrollView>
-      <View style={styles.footerContainer}>
-        <TouchableOpacity
-          style={styles.footerContinueButton}
-          onPress={() => navigation.navigate('SelectSeatScreen')}
-        >
-          <Text style={{ fontSize: 20, fontWeight: '700' }}>Đặt vé</Text>
-        </TouchableOpacity>
-      </View>
+      {movieDetail.isPlaying && (
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            style={styles.footerContinueButton}
+            onPress={() => navigation.navigate('SelectSeatScreen')}
+          >
+            <Text style={{ fontSize: 20, fontWeight: '700' }}>Đặt vé</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   )
 }
@@ -238,7 +246,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingBottom: 100,
     backgroundColor: '#000',
   },
   cover: { width: '100%', height: 240 },

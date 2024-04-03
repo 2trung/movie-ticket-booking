@@ -7,12 +7,15 @@ import {
   Image,
   Dimensions,
   Pressable,
+  SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native'
 import { RouteProp } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
 import { getNowPlayingAPI, getComingSoonAPI } from '../../apis/movieApi'
 import { Ionicons } from '@expo/vector-icons'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import FetchingApi from '../../components/FetchingApi'
 
 interface movie {
   _id: string
@@ -56,12 +59,14 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
       setComingSoon(res.data)
     })
   }, [])
+
   return (
     <SafeAreaView
       style={{
+        flex: 1,
         paddingHorizontal: 10,
-        paddingBottom: 24,
         backgroundColor: '#000',
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
       }}
     >
       <View
@@ -104,7 +109,6 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
-
       <FlatList
         data={isNowPlaying ? nowPlaying : comingSoon}
         contentContainerStyle={{
@@ -189,7 +193,6 @@ const styles = StyleSheet.create({
   comingSoonInfoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-
     gap: 5,
   },
 })

@@ -5,7 +5,7 @@
   "author": "",
   "description": "Node.js, Express.js, MongoDB base project",
   "engines": {
-    "node": "21.6.2"
+    "node": "21"
   },
   "scripts": {
     "lint": "eslint src --ext js --report-unused-disable-directives --max-warnings 0",

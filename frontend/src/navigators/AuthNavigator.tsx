@@ -6,7 +6,6 @@ import {
   ForgotPasswordScreen,
   VerificationScreen,
   ResetPasswordScreen,
-  SelectSeatScreen,
 } from '../screens/index'
 import OnboardingScreen from '../screens/OnboardingScreen'
 
@@ -17,7 +16,6 @@ const AuthNavigator = () => {
       screenOptions={{
         headerShown: false,
       }}
-      initialRouteName='SelectSeatScreen'
     >
       <Stack.Screen name='OnboardingScreen' component={OnboardingScreen} />
       <Stack.Screen name='LoginScreen' component={LoginScreen} />
