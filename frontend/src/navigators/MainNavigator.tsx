@@ -8,6 +8,7 @@ import {
   PaymentScreen,
   MovieDetailScreen,
   SelectSeatScreen,
+  SearchMovieScreen,
 } from '../screens'
 
 const MainNavigator = () => {
@@ -29,6 +30,7 @@ const MainNavigator = () => {
       <Stack.Screen name='PaymentScreen' component={PaymentScreen} />
       <Stack.Screen name='MovieDetailScreen' component={MovieDetailScreen} />
       <Stack.Screen name='SelectSeatScreen' component={SelectSeatScreen} />
+      <Stack.Screen name='SearchMovieScreen' component={SearchMovieScreen} />
     </Stack.Navigator>
   )
 }

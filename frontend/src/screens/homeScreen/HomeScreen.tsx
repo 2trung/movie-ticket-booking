@@ -8,6 +8,10 @@ import {
   TouchableOpacity,
   TextInput,
   Pressable,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+  TouchableWithoutFeedback,
 } from 'react-native'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -15,9 +19,9 @@ import { userSelector } from '../../redux/reducers/userReducer'
 
 import Carousel from '../../components/Carousel'
 import CustomHeader from '../../components/CustomHeader'
-import ContainerComponent from '../../components/ContainerComponent'
+import FetchingApi from '../../components/FetchingApi'
 
-import { getHomePageAPI } from '../../apis/movieApi'
+import { getHomePageAPI, searchMovieAPI } from '../../apis/movieApi'
 
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons'
 
@@ -55,21 +59,44 @@ const HomeScreen = ({ navigation }) => {
   }, [])
   const user = useSelector(userSelector)
 
-  if (!data)
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text>Loading...</Text>
-      </View>
-    )
+  const [search, setSearch] = useState('')
+  const [isTyping, setIsTyping] = useState(false)
+  const [searchResult, setSearchResult] = useState<movie[]>()
+
+  useEffect(() => {
+    if (search === '') {
+      setSearchResult([])
+      return
+    }
+    searchMovieAPI(search)
+      .then((res) => {
+        setSearchResult(res.data)
+      })
+      .catch((err) => {})
+  }, [search])
+
+  const handleResultPress = (movieId) => {
+    navigation.navigate('MovieDetailScreen', {
+      movieId,
+    })
+  }
+  const handleSearch = () => {
+    if (search === '') return
+    navigation.navigate('SearchMovieScreen', {
+      query: search,
+    })
+  }
+
+  if (!data) return <FetchingApi />
   return (
-    <ContainerComponent>
-      <ScrollView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        backgroundColor: '#000',
+      }}
+    >
+      <ScrollView style={styles.container} keyboardShouldPersistTaps='handled'>
         {/* Header */}
         <View style={styles.header}>
           <View>
@@ -88,14 +115,41 @@ const HomeScreen = ({ navigation }) => {
             name='magnify'
             size={24}
             color='#fff'
-            style={{ position: 'absolute', left: 36, zIndex: 1, top: 12 }}
+            style={{
+              position: 'absolute',
+              left: 36,
+              zIndex: 3,
+              top: 12,
+            }}
           />
           <TextInput
             style={styles.searchInput}
             placeholder='Tìm kiếm'
             placeholderTextColor={'#8C8C8C'}
             cursorColor={'#fff'}
+            value={search}
+            onChangeText={(text) => setSearch(text)}
+            onFocus={() => setIsTyping(true)}
+            onBlur={() => setIsTyping(false)}
+            // keyboardType='web-search'
+            returnKeyType='search'
+            onSubmitEditing={handleSearch}
           />
+
+          {search && isTyping && searchResult && searchResult.length > 0 && (
+            <View style={styles.searchResultContainer}>
+              {searchResult.map((item, index) => (
+                <TouchableWithoutFeedback
+                  key={index}
+                  onPress={() => handleResultPress(item._id)}
+                >
+                  <View style={styles.searchResult}>
+                    <Text style={{ color: '#fff' }}>{item.title}</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Đang chiếu */}
@@ -230,20 +284,21 @@ const HomeScreen = ({ navigation }) => {
             style={{
               marginHorizontal: 20,
               borderRadius: 16,
+              marginBottom: 20,
             }}
           ></Image>
         </View>
 
         {/* News */}
-        <View>
+        {/* <View>
           <CustomHeader
             text='Phân loại'
             variant='heading1'
             style={styles.heading1}
           />
-        </View>
+        </View> */}
       </ScrollView>
-    </ContainerComponent>
+    </SafeAreaView>
   )
 }
 
@@ -266,6 +321,7 @@ const styles = StyleSheet.create({
     paddingLeft: 50,
     paddingRight: 20,
     color: '#fff',
+    zIndex: 2,
   },
   heading1: {
     paddingVertical: 20,
@@ -285,6 +341,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
+  },
+  searchResultContainer: {
+    width: '100%',
+    position: 'absolute',
+    paddingTop: 50,
+    paddingBottom: 20,
+    zIndex: 1,
+    backgroundColor: '#000',
+  },
+  searchResult: {
+    backgroundColor: '#1C1C1C',
+    padding: 20,
+    marginHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 10,
   },
 })
 
