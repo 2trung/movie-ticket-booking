@@ -72,7 +72,9 @@ const HomeScreen = ({ navigation }) => {
       .then((res) => {
         setSearchResult(res.data)
       })
-      .catch((err) => {})
+      .catch((err) => {
+        setSearchResult([])
+      })
   }, [search])
 
   const handleResultPress = (movieId) => {
