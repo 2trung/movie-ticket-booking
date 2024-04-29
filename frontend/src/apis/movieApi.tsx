@@ -1,5 +1,4 @@
 import axios from '../utils/axiosInterceptors'
-
 export const getHomePageAPI = async () => {
   const response = await axios.get(`/movie/home`)
   return response.data

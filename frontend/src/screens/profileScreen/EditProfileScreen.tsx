@@ -14,14 +14,13 @@ import * as ImagePicker from 'expo-image-picker'
 import { AntDesign } from '@expo/vector-icons'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { addUser, userSelector } from '../../redux/reducers/userReducer'
-import { useEffect, useState } from 'react'
+import { userSelector } from '../../redux/reducers/userReducer'
+import { useState } from 'react'
 
-import { updateProfileAPI, updateAvatarAPI } from '../../apis/userApi'
 import ContainerComponent from '../../components/ContainerComponent'
 import Toast from 'react-native-toast-message'
 
-import { updateUser, updateAvatar } from '../../redux/reducers/userReducer'
+import { updateUser } from '../../redux/reducers/userReducer'
 
 const EditProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()

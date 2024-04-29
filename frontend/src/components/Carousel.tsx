@@ -7,11 +7,8 @@ import {
   Text,
   Pressable,
 } from 'react-native'
-import { useEffect, useRef, useState } from 'react'
-
-import CustomHeader from './CustomHeader'
+import {  useRef, useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
 
 interface movie {
   _id: string

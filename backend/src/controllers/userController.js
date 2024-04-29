@@ -1,5 +1,4 @@
 import { StatusCodes } from 'http-status-codes'
-// import ApiError from '~/utils/ApiError'
 import { userService } from '~/services/userService'
 
 const signUp = async (req, res, next) => {
