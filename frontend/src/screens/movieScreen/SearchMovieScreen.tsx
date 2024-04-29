@@ -11,13 +11,17 @@ import {
   Platform,
   StatusBar,
 } from 'react-native'
-import { RouteProp } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { searchMovieAPI } from '../../apis/movieApi'
 import { Ionicons, AntDesign } from '@expo/vector-icons'
+import {
+  searchMovie,
+  searchResultSelector,
+  searchStateSelector,
+} from '../../redux/reducers/searchReducer'
+import { useDispatch, useSelector } from 'react-redux'
 import FetchingApi from '../../components/FetchingApi'
 
-interface movie {
+interface Movie {
   _id: string
   title: string
   description: string
@@ -32,38 +36,32 @@ interface movie {
   rating: number
   rating_count: string
 }
-type RootStackParamList = {
-  SearchMovieScreen: { query: string }
-}
-
-interface MovieScreenProps {
-  route: RouteProp<RootStackParamList, 'SearchMovieScreen'>
-  navigation: any
-}
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const POSTER_WIDTH = SCREEN_WIDTH > 180 * 2 + 20 ? 180 : SCREEN_WIDTH / 2 - 20
 
-const SearchMovieScreen: React.FC<MovieScreenProps> = ({
-  route,
-  navigation,
-}) => {
-  const [searchResult, setSearchResult] = useState<Array<movie>>([])
+const SearchMovieScreen = ({ route, navigation }) => {
   const [notFound, setNotFound] = useState(false)
+  const dispatch = useDispatch()
+  const searchResult: Array<Movie> = useSelector(searchResultSelector)
+  const isLoading = useSelector(searchStateSelector)
+
   useEffect(() => {
     if (route?.params?.query === '') {
-      setSearchResult([])
       return
     }
-    searchMovieAPI(route?.params?.query)
-      .then((res) => {
-        setSearchResult(res.data)
-      })
-      .catch((err) => {
-        setNotFound(true)
-      })
+    dispatch(searchMovie(route?.params?.query) as any)
   }, [])
 
+  useEffect(() => {
+    if (searchResult.length === 0) {
+      setNotFound(true)
+    } else {
+      setNotFound(false)
+    }
+  }, [searchResult])
+
+  if (isLoading) return <FetchingApi />
   return (
     <SafeAreaView
       style={{
@@ -93,8 +91,6 @@ const SearchMovieScreen: React.FC<MovieScreenProps> = ({
         >
           Không tìm thấy kết quả
         </Text>
-      ) : searchResult.length === 0 ? (
-        <FetchingApi />
       ) : (
         <FlatList
           data={searchResult}

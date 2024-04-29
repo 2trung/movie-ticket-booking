@@ -13,9 +13,12 @@ import {
 } from 'react-native'
 import { RouteProp } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { getNowPlayingAPI, getComingSoonAPI } from '../../apis/movieApi'
 import { Ionicons } from '@expo/vector-icons'
 import FetchingApi from '../../components/FetchingApi'
+import { useDispatch } from 'react-redux'
+import { setOrder } from '../../redux/reducers/orderReducer'
+import { moviesSelector } from '../../redux/reducers/movieReducer'
+import { useSelector } from 'react-redux'
 
 interface movie {
   _id: string
@@ -46,20 +49,25 @@ const POSTER_WIDTH = SCREEN_WIDTH > 180 * 2 + 20 ? 180 : SCREEN_WIDTH / 2 - 20
 
 const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
   const [isNowPlaying, setIsNowPlaying] = useState(true)
-  useEffect(() => {
-    setIsNowPlaying(route?.params?.type === 'nowPlaying')
-  }, [route?.params?.type])
-  const [nowPlaying, setNowPlaying] = useState<Array<movie>>([])
-  const [comingSoon, setComingSoon] = useState<Array<movie>>([])
-  useEffect(() => {
-    getNowPlayingAPI().then((res) => {
-      setNowPlaying(res.data)
-    })
-    getComingSoonAPI().then((res) => {
-      setComingSoon(res.data)
-    })
-  }, [])
+  const moviesData = useSelector(moviesSelector)
 
+  const nowPlaying = moviesData.nowPlaying
+  const comingSoon = moviesData.comingSoon
+
+  useEffect(() => {
+    {
+      route?.params?.type &&
+        setIsNowPlaying(route?.params?.type === 'nowPlaying')
+    }
+  }, [route?.params?.type])
+
+  const dispatch = useDispatch()
+  const handleSelectMovie = (movie: movie) => {
+    dispatch(setOrder(movie))
+    navigation.navigate('MovieDetailScreen', {
+      movieId: movie._id,
+    })
+  }
   return (
     <SafeAreaView
       style={{
@@ -119,11 +127,7 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
           <Pressable
             key={index}
             style={{ width: POSTER_WIDTH }}
-            onPress={() =>
-              navigation.navigate('MovieDetailScreen', {
-                movieId: item._id,
-              })
-            }
+            onPress={() => handleSelectMovie(item)}
           >
             <Image
               source={{ uri: item.poster }}

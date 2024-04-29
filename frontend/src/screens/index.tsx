@@ -2,7 +2,7 @@ import LoginScreen from './authScreen/LoginScreen'
 import RegisterScreen from './authScreen/RegisterScreen'
 import OnboardingScreen from './OnboardingScreen'
 import SplashScreen from './SplashScreen'
-import ForgotPasswordScreen from './authScreen/ForgotPasswordScreen'
+import ForgetPasswordScreen from './authScreen/ForgetPasswordScreen'
 import VerificationScreen from './authScreen/VerificationScreen'
 import ResetPasswordScreen from './authScreen/ResetPasswordScreen'
 
@@ -21,13 +21,15 @@ import SearchMovieScreen from './movieScreen/SearchMovieScreen'
 
 import PaymentScreen from './orderScreen/PaymentScreen'
 import SelectSeatScreen from './orderScreen/SelectSeatScreen'
+import SelectCinemaDateTime from './orderScreen/SelectCinemaDateTime'
+import OrderHistoryScreen from './orderScreen/OrderHistoryScreen'
 
 export {
   LoginScreen,
   RegisterScreen,
   OnboardingScreen,
   SplashScreen,
-  ForgotPasswordScreen,
+  ForgetPasswordScreen,
   VerificationScreen,
   ResetPasswordScreen,
   HomeScreen,
@@ -41,4 +43,6 @@ export {
   MovieDetailScreen,
   SelectSeatScreen,
   SearchMovieScreen,
+  SelectCinemaDateTime,
+  OrderHistoryScreen,
 }

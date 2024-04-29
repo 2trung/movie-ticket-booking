@@ -10,26 +10,25 @@ import {
 
 import { userSelector } from '../../redux/reducers/userReducer'
 import { useSelector } from 'react-redux'
-import { removeUser } from '../../redux/reducers/userReducer'
+import { logout } from '../../redux/reducers/authReducer'
 import { useDispatch } from 'react-redux'
-// import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as SecureStore from 'expo-secure-store'
 
 import ContainerComponent from '../../components/ContainerComponent'
 
-import { FontAwesome } from '@expo/vector-icons'
-import { Fontisto } from '@expo/vector-icons'
-import { Feather } from '@expo/vector-icons'
-import { Octicons } from '@expo/vector-icons'
-import { MaterialIcons } from '@expo/vector-icons'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import {
+  FontAwesome,
+  Fontisto,
+  Feather,
+  Octicons,
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons'
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
-    await SecureStore.deleteItemAsync('tokens')
-    dispatch(removeUser({}))
+    dispatch(logout({}))
   }
   const selection = [
     {
@@ -43,7 +42,9 @@ const ProfileScreen = ({ navigation }) => {
     {
       label: 'Lịch sử đơn hàng',
       icon: <MaterialIcons name='shopping-cart' size={32} color='#fff' />,
-      handle: () => {},
+      handle: () => {
+        navigation.navigate('OrderHistoryScreen')
+      },
     },
     {
       label: 'Thay đổi giao diện',
@@ -92,23 +93,23 @@ const ProfileScreen = ({ navigation }) => {
         {/* Thông tin user container */}
         <View style={styles.flexRow}>
           <Image
-            source={{ uri: `data:image/jpeg;base64,${user.avatar}` }}
+            source={{ uri: `data:image/jpeg;base64,${user?.avatar}` }}
             style={styles.avatar}
           />
           <View style={{ justifyContent: 'space-around' }}>
             <Text style={styles.userName}>
-              {user.name ? user.name : 'User'}
+              {user?.name ? user?.name : 'User'}
             </Text>
             <View>
               <View style={styles.flexRowStart}>
                 <Feather name='phone' size={24} color='#fff' />
                 <Text style={{ color: '#fff' }}>
-                  {user.phone === '' ? '+84xxxxxxxxx' : user.phone}
+                  {user?.phone === '' ? '+84xxxxxxxxx' : user?.phone}
                 </Text>
               </View>
               <View style={styles.flexRowStart}>
                 <Fontisto name='email' size={24} color='#fff' />
-                <Text style={{ color: '#fff' }}>{user.email}</Text>
+                <Text style={{ color: '#fff' }}>{user?.email}</Text>
               </View>
             </View>
           </View>

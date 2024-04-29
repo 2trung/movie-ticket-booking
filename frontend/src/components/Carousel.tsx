@@ -7,11 +7,8 @@ import {
   Text,
   Pressable,
 } from 'react-native'
-import { useEffect, useRef, useState } from 'react'
-
-import CustomHeader from './CustomHeader'
+import {  useRef, useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
 
 interface movie {
   _id: string
@@ -31,11 +28,14 @@ interface movie {
 
 interface ContainerComponentProps {
   data: Array<movie>
-  navigation: any
+  handleSelectMovie: any
 }
 const WIDTH = Dimensions.get('window').width
 const PADDING = (WIDTH - 300) / 2
-const Carousel: React.FC<ContainerComponentProps> = ({ data, navigation }) => {
+const Carousel: React.FC<ContainerComponentProps> = ({
+  data,
+  handleSelectMovie,
+}) => {
   const onViewableItemsChanged = ({ viewableItems }: any) => {
     const currentIndex = viewableItems[0]?.index
     if (currentIndex !== undefined) {
@@ -79,11 +79,7 @@ const Carousel: React.FC<ContainerComponentProps> = ({ data, navigation }) => {
         renderItem={({ item, index }) => (
           <Pressable
             style={{ width: WIDTH * 0.8 - 20, marginHorizontal: 10 }}
-            onPress={() =>
-              navigation.navigate('MovieDetailScreen', {
-                movieId: item._id,
-              })
-            }
+            onPress={() => handleSelectMovie(item)}
           >
             <Image
               source={{ uri: item.poster }}

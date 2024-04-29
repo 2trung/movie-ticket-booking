@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   LoginScreen,
   RegisterScreen,
-  ForgotPasswordScreen,
+  ForgetPasswordScreen,
   VerificationScreen,
   ResetPasswordScreen,
 } from '../screens/index'
@@ -26,8 +26,8 @@ const AuthNavigator = () => {
         component={ResetPasswordScreen}
       />
       <Stack.Screen
-        name='ForgotPasswordScreen'
-        component={ForgotPasswordScreen}
+        name='ForgetPasswordScreen'
+        component={ForgetPasswordScreen}
       />
     </Stack.Navigator>
   )

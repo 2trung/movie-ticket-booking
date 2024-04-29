@@ -13,15 +13,20 @@ import {
   StatusBar,
   TouchableWithoutFeedback,
 } from 'react-native'
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect, useState, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { userSelector } from '../../redux/reducers/userReducer'
 
 import Carousel from '../../components/Carousel'
 import CustomHeader from '../../components/CustomHeader'
 import FetchingApi from '../../components/FetchingApi'
 
-import { getHomePageAPI, searchMovieAPI } from '../../apis/movieApi'
+import {
+  searchMovie,
+  searchResultSelector,
+} from '../../redux/reducers/searchReducer'
+
+import { getHomePage, moviesSelector } from '../../redux/reducers/movieReducer'
 
 import { Ionicons, MaterialCommunityIcons, Feather } from '@expo/vector-icons'
 
@@ -41,41 +46,37 @@ interface movie {
   rating_count: string
 }
 
-interface movieData {
+interface moviesProps {
   nowPlaying: Array<movie>
   comingSoon: Array<movie>
 }
 
 const HomeScreen = ({ navigation }) => {
-  const [data, setData] = useState<movieData>()
-  useEffect(() => {
-    getHomePageAPI()
-      .then((res) => {
-        setData(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  }, [])
+  const dispatch = useDispatch()
   const user = useSelector(userSelector)
+  const data = useSelector(moviesSelector)
+  const timeoutId = useRef<NodeJS.Timeout | null>(null)
 
-  const [search, setSearch] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const [isTyping, setIsTyping] = useState(false)
-  const [searchResult, setSearchResult] = useState<movie[]>()
+  // const [searchResult, setSearchResult] = useState<movie[]>()
+  const searchResult = useSelector(searchResultSelector)
 
   useEffect(() => {
-    if (search === '') {
-      setSearchResult([])
+    dispatch(getHomePage() as any)
+  }, [])
+
+  useEffect(() => {
+    if (searchQuery === '') {
       return
     }
-    searchMovieAPI(search)
-      .then((res) => {
-        setSearchResult(res.data)
-      })
-      .catch((err) => {
-        setSearchResult([])
-      })
-  }, [search])
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current)
+    }
+    timeoutId.current = setTimeout(() => {
+      dispatch(searchMovie(searchQuery) as any)
+    }, 300)
+  }, [searchQuery, dispatch])
 
   const handleResultPress = (movieId) => {
     navigation.navigate('MovieDetailScreen', {
@@ -83,10 +84,14 @@ const HomeScreen = ({ navigation }) => {
     })
   }
   const handleSearch = () => {
-    if (search === '') return
+    if (searchQuery === '') return
     navigation.navigate('SearchMovieScreen', {
-      query: search,
+      query: searchQuery,
     })
+  }
+
+  const handleSelectMovie = (movie: movie) => {
+    navigation.navigate('MovieDetailScreen', { movieId: movie._id })
   }
 
   if (!data) return <FetchingApi />
@@ -104,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
           <View>
             <CustomHeader text='Xin chào 👋' variant='body1' />
             <CustomHeader
-              text={user.name ? user.name : 'User'}
+              text={user?.name ? user?.name : 'User'}
               variant='heading2'
             />
           </View>
@@ -129,8 +134,8 @@ const HomeScreen = ({ navigation }) => {
             placeholder='Tìm kiếm'
             placeholderTextColor={'#8C8C8C'}
             cursorColor={'#fff'}
-            value={search}
-            onChangeText={(text) => setSearch(text)}
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
             onFocus={() => setIsTyping(true)}
             onBlur={() => setIsTyping(false)}
             // keyboardType='web-search'
@@ -138,20 +143,23 @@ const HomeScreen = ({ navigation }) => {
             onSubmitEditing={handleSearch}
           />
 
-          {search && isTyping && searchResult && searchResult.length > 0 && (
-            <View style={styles.searchResultContainer}>
-              {searchResult.map((item, index) => (
-                <TouchableWithoutFeedback
-                  key={index}
-                  onPress={() => handleResultPress(item._id)}
-                >
-                  <View style={styles.searchResult}>
-                    <Text style={{ color: '#fff' }}>{item.title}</Text>
-                  </View>
-                </TouchableWithoutFeedback>
-              ))}
-            </View>
-          )}
+          {searchQuery &&
+            isTyping &&
+            searchResult &&
+            searchResult.length > 0 && (
+              <View style={styles.searchResultContainer}>
+                {searchResult.map((item, index) => (
+                  <TouchableWithoutFeedback
+                    key={index}
+                    onPress={() => handleResultPress(item._id)}
+                  >
+                    <View style={styles.searchResult}>
+                      <Text style={{ color: '#fff' }}>{item.title}</Text>
+                    </View>
+                  </TouchableWithoutFeedback>
+                ))}
+              </View>
+            )}
         </View>
 
         {/* Đang chiếu */}
@@ -188,7 +196,7 @@ const HomeScreen = ({ navigation }) => {
                 ? data?.nowPlaying?.slice(0, 5)
                 : data?.nowPlaying
             }
-            navigation={navigation}
+            handleSelectMovie={handleSelectMovie}
           />
         </View>
         {/* Coming soon */}
@@ -226,11 +234,7 @@ const HomeScreen = ({ navigation }) => {
             renderItem={({ item, index }) => (
               <Pressable
                 style={{ width: 180 }}
-                onPress={() =>
-                  navigation.navigate('MovieDetailScreen', {
-                    movieId: item._id,
-                  })
-                }
+                onPress={() => handleSelectMovie(item)}
               >
                 <Image
                   source={{ uri: item.poster }}

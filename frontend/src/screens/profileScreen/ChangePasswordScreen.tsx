@@ -10,6 +10,9 @@ import CustomHeader from '../../components/CustomHeader'
 import { changePasswordAPI } from '../../apis/userApi'
 import { AntDesign } from '@expo/vector-icons'
 
+import { changePassword } from '../../redux/reducers/userReducer'
+import { useDispatch } from 'react-redux'
+
 const ChanegPasswordScreen = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -24,6 +27,7 @@ const ChanegPasswordScreen = ({ navigation }) => {
     setShowConfirmPassword(!showConfirmPassword)
 
   const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch()
 
   const handleChangePassword = async () => {
     setLoading(true)
@@ -51,33 +55,18 @@ const ChanegPasswordScreen = ({ navigation }) => {
         text1: 'Mật khẩu không khớp',
       })
     }
-    await changePasswordAPI(oldPassword, newPassword, confirmNewPassword)
-      .then((res) => {
-        setLoading(false)
-        return Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-      })
-      .catch((err) => {
-        setLoading(false)
-        return Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    dispatch(
+      changePassword({ oldPassword, newPassword, confirmNewPassword }) as any
+    )
   }
   return (
     <ContainerComponent>
       <View style={styles.container}>
         <TouchableOpacity
-          style={{
-            position: 'absolute',
-            left: '5%',
-          }}
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <AntDesign name='arrowleft' size={24} color='#fff' />
+          <AntDesign name='arrowleft' size={36} color='#fff' />
         </TouchableOpacity>
         <CustomHeader
           text='Đổi mật khẩu'

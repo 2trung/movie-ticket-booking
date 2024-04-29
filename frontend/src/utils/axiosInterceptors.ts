@@ -1,7 +1,5 @@
 import axios from 'axios'
 import { API_ROOT } from './apiRoot'
-import { removeUser } from '../redux/reducers/userReducer'
-import store from '../redux/store'
 import { setItemAsync, getItemAsync, deleteItemAsync } from 'expo-secure-store'
 
 const instance = axios.create({
@@ -59,10 +57,6 @@ instance.interceptors.response.use(
           return axios(originalRequest)
         }
       } catch (error) {
-        if (error.response.status === 401 || error.response.status === 403) {
-          store.dispatch(removeUser({}))
-          await deleteItemAsync('tokens')
-        }
         return Promise.reject(error)
       }
     }

@@ -7,8 +7,9 @@ import { loginAPI } from '../../apis/userApi'
 import { isValidateEmail } from '../../utils/emailValidate'
 
 import { useDispatch } from 'react-redux'
-import { addUser } from '../../redux/reducers/userReducer'
-import { setItemAsync } from 'expo-secure-store'
+import { login } from '../../redux/reducers/authReducer'
+import { authSelector } from '../../redux/reducers/authReducer'
+import { useSelector } from 'react-redux'
 
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
@@ -16,52 +17,34 @@ import CustomHeader from '../../components/CustomHeader'
 import { AntDesign } from '@expo/vector-icons'
 
 const LoginScreen = ({ navigation }) => {
+  const auth = useSelector(authSelector)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   const [showPassword, setShowPassword] = useState(false)
   const toggleShowPassword = () => setShowPassword(!showPassword)
 
-  const [loading, setLoading] = useState(false)
-
   const dispatch = useDispatch()
 
   const handleLogin = async () => {
-    setLoading(true)
-    if (email === '' || password === '') {
-      setLoading(false)
-      return Toast.show({
-        type: 'error',
-        text1: 'Vui lòng điền đầy đủ thông tin',
-      })
-    }
-
-    if (!isValidateEmail(email)) {
-      setLoading(false)
-      return Toast.show({
-        type: 'error',
-        text1: 'Email không hợp lệ',
-      })
-    }
-    await loginAPI(email, password)
-      .then((res) => {
-        setLoading(false)
-        dispatch(addUser(res.data))
-        setItemAsync(
-          'tokens',
-          JSON.stringify({
-            accessToken: res.data.accessToken,
-            refreshToken: res.data.refreshToken,
-          })
-        )
-      })
-      .catch((err) => {
-        setLoading(false)
-        Toast.show({
+    try {
+      if (email === '' || password === '') {
+        return Toast.show({
           type: 'error',
-          text1: err.response.data.message,
+          text1: 'Vui lòng điền đầy đủ thông tin',
         })
-      })
+      }
+
+      if (!isValidateEmail(email)) {
+        return Toast.show({
+          type: 'error',
+          text1: 'Email không hợp lệ',
+        })
+      }
+      await dispatch(login({ email, password }) as any)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -117,7 +100,7 @@ const LoginScreen = ({ navigation }) => {
         />
         <TouchableOpacity
           style={{ alignSelf: 'flex-end', paddingHorizontal: 20 }}
-          onPress={() => navigation.navigate('ForgotPasswordScreen')}
+          onPress={() => navigation.navigate('ForgetPasswordScreen')}
         >
           <Text style={{ color: '#fff' }}>Quên mật khẩu?</Text>
         </TouchableOpacity>
@@ -127,7 +110,7 @@ const LoginScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
-          loading={loading}
+          loading={auth.isLoading}
           onPress={() => handleLogin()}
         >
           Đăng nhập

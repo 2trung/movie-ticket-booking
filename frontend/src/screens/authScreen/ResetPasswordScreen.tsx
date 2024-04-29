@@ -3,13 +3,13 @@ import { TextInput, Button } from 'react-native-paper'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
-import { resetPasswordAPI } from '../../apis/userApi'
 import CustomHeader from '../../components/CustomHeader'
 import ContainerComponent from '../../components/ContainerComponent'
 
 import { AntDesign } from '@expo/vector-icons'
+
+import { emailSelector, resetPassword } from '../../redux/reducers/authReducer'
+import { useSelector, useDispatch } from 'react-redux'
 
 const ResetPasswordScreen = ({ navigation }) => {
   const [password, setPassword] = useState('')
@@ -22,46 +22,32 @@ const ResetPasswordScreen = ({ navigation }) => {
   const toggleShowConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword)
 
-  const [loading, setLoading] = useState(false)
+  const email = useSelector(emailSelector)
+  const dispatch = useDispatch()
 
   const handleChangePassword = async () => {
-    setLoading(true)
-    const user = await AsyncStorage.getItem('auth')
-    const userData = JSON.parse(user || '{}')
-
     if (password !== confirmPassword) {
-      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Mật khẩu không khớp',
       })
     }
     if (password.length < 6) {
-      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Mật khẩu phải có ít nhất 6 ký tự',
       })
     }
-    await resetPasswordAPI(userData.email, password, confirmPassword)
-      .then((res) => {
-        setLoading(false)
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-        AsyncStorage.clear()
-        setTimeout(() => {
-          navigation.navigate('LoginScreen')
-        }, 2000)
-      })
-      .catch((err) => {
-        setLoading(false)
-        Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    const result = await dispatch(
+      resetPassword({
+        email: email,
+        newPassword: password,
+        confirmation: confirmPassword,
+      }) as any
+    )
+    if (resetPassword.fulfilled.match(result)) {
+      navigation.navigate('LoginScreen')
+    }
   }
   return (
     <ContainerComponent>
@@ -133,7 +119,6 @@ const ResetPasswordScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
-          loading={loading}
           onPress={() => handleChangePassword()}
         >
           Xác nhận

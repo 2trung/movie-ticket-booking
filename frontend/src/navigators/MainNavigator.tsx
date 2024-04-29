@@ -9,11 +9,12 @@ import {
   MovieDetailScreen,
   SelectSeatScreen,
   SearchMovieScreen,
+  SelectCinemaDateTime,
+  OrderHistoryScreen,
 } from '../screens'
 
 const MainNavigator = () => {
   const Stack = createNativeStackNavigator()
-
   return (
     <Stack.Navigator
       screenOptions={{
@@ -31,6 +32,11 @@ const MainNavigator = () => {
       <Stack.Screen name='MovieDetailScreen' component={MovieDetailScreen} />
       <Stack.Screen name='SelectSeatScreen' component={SelectSeatScreen} />
       <Stack.Screen name='SearchMovieScreen' component={SearchMovieScreen} />
+      <Stack.Screen
+        name='SelectCinemaDateTime'
+        component={SelectCinemaDateTime}
+      />
+      <Stack.Screen name='OrderHistoryScreen' component={OrderHistoryScreen} />
     </Stack.Navigator>
   )
 }

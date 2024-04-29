@@ -1,4 +1,12 @@
 import {
+  Ionicons,
+  AntDesign,
+  Octicons,
+  MaterialCommunityIcons,
+  FontAwesome,
+} from '@expo/vector-icons'
+
+import {
   View,
   Text,
   Dimensions,
@@ -6,24 +14,52 @@ import {
   TouchableOpacity,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
 import QRCode from 'react-native-qrcode-svg'
 
+import { useEffect } from 'react'
+import {
+  getTicketDetail,
+  ticketDetailSelector,
+} from '../../redux/reducers/ticketReducer'
+import { useDispatch, useSelector } from 'react-redux'
+
 import ContainerComponent from '../../components/ContainerComponent'
+import FetchingApi from '../../components/FetchingApi'
 
-import { Ionicons } from '@expo/vector-icons'
-import { AntDesign } from '@expo/vector-icons'
-import { Octicons } from '@expo/vector-icons'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { FontAwesome } from '@expo/vector-icons'
+interface TicketDetail {
+  order_id: string
+  schedule_id: string
+  start_time: string
+  room_number: string
+  movie_title: string
+  movie_poster: string
+  movie_genres: Array<string>
+  movie_duration: number
+  cinema_name: string
+  cinema_location: string
+  selectedSeats: Array<string>
+  total: number
+  order_time: string
+  status: string
+}
 
-const TicketDetailScreen = ({ navigation }) => {
+const TicketDetailScreen = ({ route, navigation }) => {
   const WIDTH = Dimensions.get('window').width
+  const dispatch = useDispatch()
+
+  const ticketDetail: TicketDetail = useSelector(ticketDetailSelector)
+
+  useEffect(() => {
+    dispatch(getTicketDetail(route.params.orderId) as any)
+  }, [])
+
+  if (!ticketDetail) return <FetchingApi />
+
   return (
     <ContainerComponent>
       <ScrollView>
-        {/* <StatusBar style='light' /> */}
         {/* Header */}
         <View style={{ marginBottom: 40, alignItems: 'center' }}>
           <TouchableOpacity
@@ -41,10 +77,13 @@ const TicketDetailScreen = ({ navigation }) => {
         >
           {/* Thông tin phim */}
           <View style={styles.header}>
-            <View style={styles.movieCover} />
+            <Image
+              source={{ uri: ticketDetail.movie_poster }}
+              style={styles.movieCover}
+            />
             <View style={{ width: WIDTH * 0.9 - 125 - 60, paddingTop: 20 }}>
               <Text numberOfLines={2} style={styles.movieTitle}>
-                Avengers: Infinity War
+                {ticketDetail.movie_title}
               </Text>
               <View style={styles.movieDetailContainer}>
                 <AntDesign
@@ -54,7 +93,11 @@ const TicketDetailScreen = ({ navigation }) => {
                   style={styles.alightCenter}
                 />
                 <Text numberOfLines={1} style={styles.alightCenter}>
-                  2 giờ 29 phút
+                  {ticketDetail.movie_duration > 60
+                    ? `${Math.floor(ticketDetail.movie_duration / 60)} giờ ${
+                        ticketDetail.movie_duration % 60
+                      } phút`
+                    : `${ticketDetail.movie_duration} phút`}
                 </Text>
               </View>
               <View style={styles.movieDuration}>
@@ -65,7 +108,7 @@ const TicketDetailScreen = ({ navigation }) => {
                   style={styles.alightCenter}
                 />
                 <Text numberOfLines={1} style={styles.movieCens}>
-                  Hành động, Phiêu lưu, Tâm lý
+                  {ticketDetail.movie_genres.join(', ')}
                 </Text>
               </View>
             </View>
@@ -76,8 +119,16 @@ const TicketDetailScreen = ({ navigation }) => {
             <View style={styles.movieTime}>
               <AntDesign name='calendar' size={50} color='black' />
               <View style={{ justifyContent: 'space-around' }}>
-                <Text style={{ fontWeight: '500' }}>19:00</Text>
-                <Text style={{ fontWeight: '500' }}>10.10.2010</Text>
+                <Text style={{ fontWeight: '500' }}>
+                  {ticketDetail.start_time.split('T')[1].slice(0, 5)}
+                </Text>
+                <Text style={{ fontWeight: '500' }}>
+                  {ticketDetail.start_time
+                    .split('T')[0]
+                    .split('-')
+                    .reverse()
+                    .join('.')}
+                </Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -87,12 +138,15 @@ const TicketDetailScreen = ({ navigation }) => {
                 color='black'
               />
               <View style={{ justifyContent: 'space-around' }}>
-                <Text style={{ fontWeight: '500' }}>Phòng 4</Text>
+                <Text style={{ fontWeight: '500' }}>
+                  Phòng {ticketDetail.room_number}
+                </Text>
                 <Text
                   numberOfLines={1}
                   style={{ fontWeight: '500', width: 96 }}
                 >
-                  Ghế H1, H2, H3, H4
+                  Ghế({ticketDetail.selectedSeats.length}){': '}
+                  {ticketDetail.selectedSeats.join(', ')}
                 </Text>
               </View>
             </View>
@@ -108,7 +162,7 @@ const TicketDetailScreen = ({ navigation }) => {
               <Text
                 style={{ alignSelf: 'center', fontSize: 18, fontWeight: '700' }}
               >
-                210.000 VND
+                {ticketDetail.total.toLocaleString('vi-VN')} VND
               </Text>
             </View>
 
@@ -121,7 +175,7 @@ const TicketDetailScreen = ({ navigation }) => {
               <Text
                 style={{ alignSelf: 'center', fontSize: 18, fontWeight: '700' }}
               >
-                Vincom Ocean Park
+                {ticketDetail.cinema_name}
               </Text>
             </View>
 
@@ -132,7 +186,7 @@ const TicketDetailScreen = ({ navigation }) => {
                 width: '80%',
               }}
             >
-              Tầng 4, Vincom Ocean Park, Da Ton, Gia Lam, Ha Noi
+              {ticketDetail.cinema_location}
             </Text>
 
             <View style={styles.ticketDetail2}>
@@ -153,11 +207,11 @@ const TicketDetailScreen = ({ navigation }) => {
           {/* Mã QR */}
           <View style={{ alignItems: 'center' }}>
             <QRCode
-              value='66010ef6d82009222e7c29dd'
+              value={ticketDetail.order_id}
               size={Platform.OS == 'android' ? 120 : 140}
             />
             <Text style={{ padding: 20 }}>
-              Mã giao dịch: 66010ef6d82009222e7c29dd
+              Mã giao dịch: {ticketDetail.order_id}
             </Text>
           </View>
         </View>
@@ -187,8 +241,9 @@ const styles = StyleSheet.create({
   movieTitle: {
     color: '#000',
     fontSize: 20,
-    fontWeight: '500',
-    lineHeight: 30,
+    fontWeight: '700',
+    marginBottom: 10,
+    // lineHeight: 30,
   },
   movieDetailContainer: {
     flexDirection: 'row',

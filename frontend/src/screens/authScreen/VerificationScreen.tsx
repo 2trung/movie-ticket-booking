@@ -3,17 +3,24 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
 
-import AsyncStorage from '@react-native-async-storage/async-storage'
-
 import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
-import { verifyOtpAPI, resendOtpAPI } from '../../apis/userApi'
 
 import { AntDesign } from '@expo/vector-icons'
 
-const VerificationScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('')
+import {
+  emailSelector,
+  resendOtp,
+  verifyOtp,
+} from '../../redux/reducers/authReducer'
+import { useDispatch, useSelector } from 'react-redux'
+
+const VerificationScreen = ({ route, navigation }) => {
+  const dispatch = useDispatch()
   const [countdown, setCountdown] = useState(60)
+  const [codeValues, setCodeValues] = useState<string[]>([])
+  const email = useSelector(emailSelector)
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCountdown((time) => time - 1)
@@ -21,26 +28,10 @@ const VerificationScreen = ({ navigation }) => {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    const getEmail = async () => {
-      const user = await AsyncStorage.getItem('auth')
-      const userData = JSON.parse(user || '{}')
-      setEmail(userData.email)
-    }
-    getEmail()
-  }, [])
-
   const ref1 = useRef<any>()
   const ref2 = useRef<any>()
   const ref3 = useRef<any>()
   const ref4 = useRef<any>()
-
-  const [codeValues, setCodeValues] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
-
-  // useEffect(() => {
-  //   ref1.current.focus()
-  // }, [])
 
   const handleChangeCode = (val: string, index: number) => {
     const data = [...codeValues]
@@ -48,51 +39,24 @@ const VerificationScreen = ({ navigation }) => {
     setCodeValues(data)
   }
   const handleResendOtp = async () => {
-    const auth = await AsyncStorage.getItem('auth')
-    const authData = JSON.parse(auth || '{}')
-    await resendOtpAPI(authData.email)
-      .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-        setCountdown(60)
-      })
-      .catch((err) => {
-        Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    const result = await dispatch(resendOtp({ email }) as any)
+    if (resendOtp.fulfilled.match(result)) {
+      setCountdown(60)
+    }
   }
   const handleVerifyOtp = async () => {
-    setLoading(true)
     if (codeValues.join('').length < 4) {
-      setLoading(false)
       return Toast.show({
         type: 'error',
         text1: 'Vui lòng nhập đủ mã OTP',
       })
     }
-    const auth = await AsyncStorage.getItem('auth')
-    const authData = JSON.parse(auth || '{}')
-    await verifyOtpAPI(authData.email, codeValues.join(''))
-      .then((res) => {
-        setLoading(false)
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-        AsyncStorage.setItem('auth', JSON.stringify(res.data))
-        navigation.navigate('ResetPasswordScreen')
-      })
-      .catch((err) => {
-        setLoading(false)
-        Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    const result = await dispatch(
+      verifyOtp({ email: email, otp: codeValues.join('') }) as any
+    )
+    if (verifyOtp.fulfilled.match(result)) {
+      navigation.navigate('ResetPasswordScreen')
+    }
   }
 
   return (
@@ -173,7 +137,7 @@ const VerificationScreen = ({ navigation }) => {
           textColor='#000'
           labelStyle={styles.textButton}
           style={styles.button}
-          loading={loading}
+          // loading={loading}
           onPress={() => handleVerifyOtp()}
         >
           Gửi
