@@ -7,15 +7,13 @@ import ContainerComponent from '../../components/ContainerComponent'
 import CustomHeader from '../../components/CustomHeader'
 
 import { useDispatch } from 'react-redux'
-import { addUser } from '../../redux/reducers/userReducer'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { forgetPassword } from '../../redux/reducers/authReducer'
 
 import { isValidateEmail } from '../../utils/emailValidate'
-import { forgetPasswordAPI } from '../../apis/userApi'
 
 import { AntDesign } from '@expo/vector-icons'
 
-const ForgotPasswordScreen = ({ navigation }) => {
+const ForgetPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const dispatch = useDispatch()
 
@@ -26,19 +24,10 @@ const ForgotPasswordScreen = ({ navigation }) => {
         text1: 'Email không hợp lệ',
       })
     }
-
-    await forgetPasswordAPI(email)
-      .then((res) => {
-        dispatch(addUser(res.data))
-        AsyncStorage.setItem('auth', JSON.stringify(res.data))
-        navigation.navigate('VerificationScreen')
-      })
-      .catch((err) => {
-        Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    const result = await dispatch(forgetPassword({ email }) as any)
+    if (forgetPassword.fulfilled.match(result)) {
+      navigation.navigate('VerificationScreen')
+    }
   }
   return (
     <ContainerComponent>
@@ -81,7 +70,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
   )
 }
 
-export default ForgotPasswordScreen
+export default ForgetPasswordScreen
 
 const styles = StyleSheet.create({
   container: {

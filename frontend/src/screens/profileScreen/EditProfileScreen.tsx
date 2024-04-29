@@ -17,27 +17,22 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addUser, userSelector } from '../../redux/reducers/userReducer'
 import { useEffect, useState } from 'react'
 
-import { updateProfileAPI, updateAvatarAPI } from '../../apis'
+import { updateProfileAPI, updateAvatarAPI } from '../../apis/userApi'
 import ContainerComponent from '../../components/ContainerComponent'
 import Toast from 'react-native-toast-message'
+
+import { updateUser, updateAvatar } from '../../redux/reducers/userReducer'
 
 const EditProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch()
   const user = useSelector(userSelector)
 
-  const [avatar, setAvatar] = useState('')
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const [avatar, setAvatar] = useState(user.avatar)
+  const [name, setName] = useState(user.name)
+  const [email, setEmail] = useState(user.email)
+  const [phone, setPhone] = useState(user.phone)
   const [fileAvatar, setFileAvatar] = useState<any>()
-  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    setAvatar(user.avatar)
-    setName(user.name)
-    setEmail(user.email)
-    setPhone(user.phone)
-  }, [])
   const handleUpload = async () => {
     try {
       const file = await ImagePicker.launchImageLibraryAsync({
@@ -45,43 +40,30 @@ const EditProfileScreen = ({ navigation }) => {
         base64: true,
         quality: 1,
       })
-
-      if (!file.canceled) {
-        setAvatar(file.assets[0].base64)
-        setFileAvatar(file.assets[0])
-      }
+      setAvatar(file.assets[0].base64)
+      setFileAvatar(file.assets[0])
     } catch (error) {
-      console.error('Lỗi khi tải lên hình ảnh')
+      return Toast.show({
+        type: 'error',
+        text1: 'Không tìm thấy hình ảnh',
+      })
     }
   }
   const handleSave = async () => {
-    setLoading(true)
-    fileAvatar &&
-      (await updateAvatarAPI({
-        uri: fileAvatar.uri,
-        name: fileAvatar.fileName,
-        type: fileAvatar.mimeType,
-      })
-        .then((res) => {})
-        .catch((err) => {
-          setLoading(false)
-        }))
-    await updateProfileAPI(name, phone, email)
-      .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-        dispatch(addUser(res.data))
-      })
-      .catch((err) => {
-        setLoading(false)
-        return Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
-    setLoading(false)
+    await dispatch(
+      updateUser({
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        avatar: fileAvatar
+          ? {
+              uri: fileAvatar.uri,
+              name: fileAvatar.fileName,
+              type: fileAvatar.mimeType,
+            }
+          : '',
+      }) as any
+    )
   }
 
   return (
@@ -92,7 +74,7 @@ const EditProfileScreen = ({ navigation }) => {
             style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
-            <AntDesign name='arrowleft' size={24} color='#000' />
+            <AntDesign name='arrowleft' size={36} color='#000' />
           </TouchableOpacity>
 
           <Text style={styles.textLarge}>Chỉnh sửa thông tin</Text>
@@ -159,10 +141,11 @@ const EditProfileScreen = ({ navigation }) => {
         mode='contained'
         buttonColor='#FCC434'
         textColor='#000'
-        labelStyle={styles.textButton}
-        style={styles.button}
+        labelStyle={styles.buttonLabel}
+        style={styles.saveButton}
         onPress={() => handleSave()}
-        loading={loading}
+        // loading={loading}
+        // disabled={loading}
       >
         Lưu
       </Button>
@@ -176,12 +159,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: '35%',
   },
-  textButton: {
+  buttonLabel: {
     fontSize: 16,
     lineHeight: 30,
     fontWeight: 'bold',
   },
-  button: {
+  saveButton: {
     width: '90%',
     borderRadius: 10,
     margin: 10,

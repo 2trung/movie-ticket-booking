@@ -1,15 +1,22 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import { useState } from 'react'
 import Toast from 'react-native-toast-message'
 
+import { useDispatch } from 'react-redux'
+import { register } from '../../redux/reducers/authReducer'
+
 import { isValidateEmail } from '../../utils/emailValidate'
-import { registerAPI } from '../../apis'
+import { registerAPI } from '../../apis/userApi'
 
 import CustomHeader from '../../components/CustomHeader'
 import ContainerComponent from '../../components/ContainerComponent'
 
+import { AntDesign } from '@expo/vector-icons'
+
 const RegisterScreen = ({ navigation }) => {
+  const dispatch = useDispatch()
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -48,32 +55,22 @@ const RegisterScreen = ({ navigation }) => {
         text1: 'Mật khẩu phải có ít nhất 6 ký tự',
       })
     }
-    await registerAPI(email, password, confirmPassword)
-      .then((res) => {
-        Toast.show({
-          type: 'success',
-          text1: res.message,
-        })
-        navigation.navigate('LoginScreen')
-      })
-      .catch((err) => {
-        Toast.show({
-          type: 'error',
-          text1: err.response.data.message,
-        })
-      })
+    const result = await dispatch(
+      register({ email, password, confirmation: confirmPassword }) as any
+    )
+    if (register.fulfilled.match(result)) {
+      navigation.navigate('LoginScreen')
+    }
   }
   return (
     <ContainerComponent>
       <View style={styles.container}>
-        <Button
-          icon='arrow-left'
+        <TouchableOpacity
           style={styles.backButton}
-          textColor='#fff'
           onPress={() => navigation.goBack()}
         >
-          Quay lại
-        </Button>
+          <AntDesign name='arrowleft' size={36} color='#fff' />
+        </TouchableOpacity>
         <CustomHeader
           text='Đăng ký'
           variant='title'

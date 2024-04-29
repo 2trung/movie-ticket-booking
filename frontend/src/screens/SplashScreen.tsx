@@ -1,8 +1,15 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 import LottieView from 'lottie-react-native'
+import { getUser } from '../redux/reducers/userReducer'
+import { useDispatch } from 'react-redux'
+import { useEffect } from 'react'
 
 const SplashScreen = () => {
+  const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(getUser() as any)
+  }, [])
   return (
     <View
       style={{
