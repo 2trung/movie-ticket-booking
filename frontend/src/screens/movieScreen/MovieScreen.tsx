@@ -14,7 +14,8 @@ import {
 import { RouteProp } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
-import FetchingApi from '../../components/FetchingApi'
+import { UnixToTime } from '../../utils/timeConvert'
+
 import { useDispatch } from 'react-redux'
 import { setOrder } from '../../redux/reducers/orderReducer'
 import { moviesSelector } from '../../redux/reducers/movieReducer'
@@ -153,7 +154,7 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
                   <Ionicons name='calendar-outline' size={16} color='#F2F2F2' />
 
                   <Text style={{ color: '#F2F2F2' }}>
-                    {item.releaseDate.slice(0, 10).replaceAll('-', '.')}
+                    {UnixToTime(item?.releaseDate)}
                   </Text>
                 </View>
               </View>

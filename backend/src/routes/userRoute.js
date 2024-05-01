@@ -5,6 +5,7 @@ import {
   verifyAccessToken,
   verifyRefreshToken,
 } from '~/middlewares/authMiddleware'
+
 import multer from 'multer'
 
 const storage = multer.memoryStorage()
@@ -40,6 +41,7 @@ Router.route('/resend-otp').post(
 
 Router.route('/update-profile').put(
   verifyAccessToken,
+  upload.single('image'),
   userValidation.updateProfile,
   userController.updateProfile
 )
@@ -55,4 +57,5 @@ Router.route('/refresh-token').post(
   userController.refreshToken
 )
 
+Router.route('/all').get(userController.getAll)
 export const userRoute = Router

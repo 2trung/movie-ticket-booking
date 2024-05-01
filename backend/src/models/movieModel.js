@@ -21,7 +21,10 @@ const MOVIE_COLLECTION_SCHEMA = Joi.object({
   cens: Joi.string().required(),
   poster: Joi.string().min(1).max(255).trim().required(),
   rating: Joi.number().required(),
+  origin: Joi.string().min(1).max(255).trim().required(),
 })
+
+const INVALID_UPDATE_FIELDS = ['_id']
 
 const validateBeforeCreate = async (data) => {
   return await MOVIE_COLLECTION_SCHEMA.validateAsync(data, {
@@ -31,7 +34,12 @@ const validateBeforeCreate = async (data) => {
 
 const addMovie = async (data) => {
   try {
-    const validatedData = await validateBeforeCreate(data)
+    const updateData = { ...data }
+    INVALID_UPDATE_FIELDS.forEach((field) => {
+      delete updateData[field]
+    })
+    updateData = await validateBeforeCreate(data)
+
     if (validatedData.cast) {
       validatedData.cast = validatedData.cast.map(
         (cast) => new ObjectId(String(cast))
@@ -53,7 +61,7 @@ const getComingMovie = async () => {
   try {
     const comingMovies = await GET_DB()
       .collection(MOVIE_COLLECTION_NAME)
-      .find({ releaseDate: { $gte: new Date() } })
+      .find({ releaseDate: { $gte: new Date().getTime() } })
       .toArray()
     return comingMovies
   } catch (error) {
@@ -82,5 +90,50 @@ const searchMovie = async (searchTerm) => {
     throw new Error(error)
   }
 }
+const getAll = async () => {
+  try {
+    const movies = await GET_DB()
+      .collection(MOVIE_COLLECTION_NAME)
+      .find()
+      .toArray()
+    return movies
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+const update = async (data) => {
+  try {
+    const updateData = { ...data }
+    INVALID_UPDATE_FIELDS.forEach((field) => {
+      delete updateData[field]
+    })
+    if (updateData.cast) {
+      updateData.cast = updateData.cast.map(
+        (cast) => new ObjectId(String(cast))
+      )
+    }
+    if (updateData.director)
+      updateData.director = new ObjectId(String(updateData.director))
+    const updatedUser = await GET_DB()
+      .collection(MOVIE_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(String(data._id)) },
+        {
+          $set: updateData,
+        },
+        { returnDocument: 'after' }
+      )
+    return updatedUser
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
-export const movieModel = { addMovie, getComingMovie, getById, searchMovie }
+export const movieModel = {
+  addMovie,
+  getComingMovie,
+  getById,
+  searchMovie,
+  getAll,
+  update,
+}

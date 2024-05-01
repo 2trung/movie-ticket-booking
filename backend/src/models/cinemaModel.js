@@ -19,5 +19,16 @@ const getById = async (_id) => {
     throw new Error(error)
   }
 }
+const getAll = async () => {
+  try {
+    const cinemas = await GET_DB()
+      .collection(CINEMA_COLLECTION_NAME)
+      .find()
+      .toArray()
+    return cinemas
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 
-export const cinemaModel = { getById }
+export const cinemaModel = { getById, getAll }

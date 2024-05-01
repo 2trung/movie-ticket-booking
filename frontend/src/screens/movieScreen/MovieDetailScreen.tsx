@@ -9,15 +9,13 @@ import {
   Pressable,
   ScrollView,
   Modal,
-  TouchableWithoutFeedback,
 } from 'react-native'
 import { useState, useEffect } from 'react'
-import { getMovieDetailAPI } from '../../apis/movieApi'
 import { AntDesign, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons'
 import FetchingApi from '../../components/FetchingApi'
 import CustomHeader from '../../components/CustomHeader'
 import { RouteProp } from '@react-navigation/native'
-import { movieSelector } from '../../redux/reducers/orderReducer'
+
 import { useSelector } from 'react-redux'
 import {
   getMovieDetail,
@@ -25,6 +23,8 @@ import {
 } from '../../redux/reducers/movieReducer'
 import { useDispatch } from 'react-redux'
 import { WebView } from 'react-native-webview'
+
+import { UnixToTime } from '../../utils/timeConvert'
 
 type RootStackParamList = {
   MovieDetailScreen: { movieId: string }
@@ -106,11 +106,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
             <Text style={{ color: '#BFBFBF' }}>
               {formatDuration(movieDetail?.duration)}
               {' • '}
-              {movieDetail?.releaseDate
-                .slice(0, 10)
-                .split('-')
-                .reverse()
-                .join('.')}
+              {UnixToTime(movieDetail?.releaseDate)}
             </Text>
           </View>
           <View>

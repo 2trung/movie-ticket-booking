@@ -77,7 +77,11 @@ const getUser = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
   try {
-    const response = await userService.updateProfile(req.user._id, req.body)
+    const response = await userService.updateProfile(
+      req.user._id,
+      req.file,
+      req.body
+    )
     res.status(StatusCodes.OK).json(response)
   } catch (error) {
     next(error)
@@ -104,6 +108,14 @@ const refreshToken = async (req, res, next) => {
     next(error)
   }
 }
+const getAll = async (req, res, next) => {
+  try {
+    const response = await userService.getAll(req.query)
+    res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const userController = {
   signUp,
@@ -117,4 +129,5 @@ export const userController = {
   updateProfile,
   updateAvatar,
   refreshToken,
+  getAll,
 }

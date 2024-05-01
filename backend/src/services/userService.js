@@ -46,7 +46,7 @@ const getUser = async (_id) => {
       name: user.name,
       phone: user.phone,
       accessToken: user.accessToken,
-      refeshToken: user.refreshToken,
+      refreshToken: user.refreshToken,
       avatar: user.avatar,
     }
   } catch (error) {
@@ -76,21 +76,21 @@ const login = async (reqBody) => {
     const user = await userModel.getByEmail(reqBody.email)
     if (!user)
       throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
+        StatusCodes.FORBIDDEN,
         'Email hoặc mật khẩu không chính xác'
       )
 
     const isPasswordMatch = bcrypt.compareSync(reqBody.password, user.password)
     if (!isPasswordMatch || !user)
       throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
+        StatusCodes.FORBIDDEN,
         'Email hoặc mật khẩu không chính xác'
       )
 
     const accessToken = jwt.sign(
       { _id: user._id, email: user.email },
       env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '1d' }
     )
     const refreshToken = jwt.sign(
       { _id: user._id, email: user.email },
@@ -121,7 +121,7 @@ const login = async (reqBody) => {
 
 const changePassword = async (_id, oldPassword, newPassword) => {
   try {
-    const user = await userModel.getByIdId(_id)
+    const user = await userModel.getById(_id)
 
     if (!user)
       throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy người dùng')
@@ -129,17 +129,14 @@ const changePassword = async (_id, oldPassword, newPassword) => {
     const hashPassword = bcrypt.hashSync(newPassword, 10)
     const isPasswordMatch = bcrypt.compareSync(oldPassword, user.password)
     if (!isPasswordMatch)
-      throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
-        'Mật khẩu cũ không chính xác'
-      )
+      throw new ApiError(StatusCodes.FORBIDDEN, 'Mật khẩu cũ không chính xác')
     if (oldPassword === newPassword)
       throw new ApiError(
         StatusCodes.UNPROCESSABLE_ENTITY,
         'Mật khẩu mới phải khác mật khẩu cũ'
       )
     const updatedUser = await userModel.changePassword(_id, hashPassword)
-    return { message: 'Cập nhật mật khẩu thành công' }
+    return { message: 'Cập nhật mật khẩu thành công', data: updatedUser }
   } catch (error) {
     throw error
   }
@@ -173,9 +170,9 @@ const verifyOtp = async (email, otp) => {
   const userOtp = await otpModel.getOtpByEmail(email)
   if (!userOtp) throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy OTP')
   if (!bcrypt.compareSync(otp, userOtp.otp))
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP không hợp lệ')
+    throw new ApiError(StatusCodes.FORBIDDEN, 'OTP không hợp lệ')
   if (userOtp.expTime < new Date().getTime())
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP hết hạn')
+    throw new ApiError(StatusCodes.FORBIDDEN, 'OTP hết hạn')
 
   const expTime = new Date().getTime() + 1 * 60 * 1000
   await otpModel.updateOtpStatus(email, true, expTime)
@@ -195,7 +192,7 @@ const resendOtp = async (email) => {
       (userOtp.resendTime - new Date().getTime()) / 1000
     )
     throw new ApiError(
-      StatusCodes.UNAUTHORIZED,
+      StatusCodes.FORBIDDEN,
       'Bạn chỉ có thể gửi lại otp sau ' + remainMinutes + ' giây'
     )
   }
@@ -222,9 +219,9 @@ const resetPassword = async (email, newPassword) => {
       'Gửi OTP trước khi đặt lại mật khẩu'
     )
   if (userOtp.expTime < new Date().getTime())
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP hết hạn')
+    throw new ApiError(StatusCodes.FORBIDDEN, 'OTP hết hạn')
   if (!userOtp.isVerify)
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'OTP chưa được xác nhận')
+    throw new ApiError(StatusCodes.FORBIDDEN, 'OTP chưa được xác nhận')
 
   const user = await userModel.getByEmail(email)
   const hashPassword = bcrypt.hashSync(newPassword, 10)
@@ -234,12 +231,17 @@ const resetPassword = async (email, newPassword) => {
   return { message: 'Đã cập nhật mật khẩu mới', email: updatedUser.email }
 }
 
-const updateProfile = async (_id, reqBody) => {
+const updateProfile = async (_id, reqFile, reqBody) => {
   try {
-    const updatedUser = await userModel.updateProfile(_id, {
+    const avataBase64 = reqFile?.buffer.toString('base64')
+    const updateData = {
       ...reqBody,
       updatedAt: Date.now(),
-    })
+    }
+    if (avataBase64) {
+      updateData.avatar = avataBase64
+    }
+    const updatedUser = await userModel.updateProfile(_id, updateData)
     return {
       message: 'Cập nhật thông tin thành công',
       data: {
@@ -247,8 +249,6 @@ const updateProfile = async (_id, reqBody) => {
         email: updatedUser.email,
         phone: updatedUser.phone,
         avatar: updatedUser.avatar,
-        accessToken: updatedUser.accessToken,
-        refeshToken: updatedUser.refreshToken,
       },
     }
   } catch (error) {
@@ -262,7 +262,15 @@ const updateAvatar = async (_id, avatar) => {
       avatar: avataBase64,
       updatedAt: Date.now(),
     })
-    return { message: 'Avatar updated' }
+    return {
+      message: 'Avatar updated',
+      data: {
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        avatar: updatedUser.avatar,
+      },
+    }
   } catch (error) {
     throw error
   }
@@ -288,7 +296,20 @@ const refreshToken = async (_id, email) => {
     refreshToken: authUser.refreshToken,
   }
 }
-
+const getAll = async (reqQuery) => {
+  try {
+    const response = await userModel.getAll(
+      parseInt(reqQuery.page),
+      parseInt(reqQuery.pageSize)
+    )
+    return {
+      message: 'Lấy dữ liệu thành công',
+      data: response,
+    }
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error)
+  }
+}
 export const userService = {
   signUp,
   login,
@@ -301,4 +322,5 @@ export const userService = {
   updateProfile,
   updateAvatar,
   refreshToken,
+  getAll,
 }

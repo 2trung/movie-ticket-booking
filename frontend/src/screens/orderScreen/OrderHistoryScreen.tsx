@@ -39,6 +39,7 @@ const OrderHistoryScreen = ({ navigation }) => {
 
   const handleCancelOrder = async (orderId) => {
     dispatch(cancelOrder(orderId) as any)
+    setRefreshKey(refreshKey + 1)
   }
   const handleViewDetail = async (order: any) => {
     if (order.status === 'pending')
@@ -144,7 +145,7 @@ const OrderHistoryScreen = ({ navigation }) => {
                   </Text>
                 </View>
               </Pressable>
-              {item.order_id === selecting && item.status === 'pending' && (
+              {item.status === 'pending' && (
                 <View
                   style={{
                     flexDirection: 'row',

@@ -20,6 +20,7 @@ import {
 } from '../../redux/reducers/searchReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import FetchingApi from '../../components/FetchingApi'
+import { UnixToTime } from '../../utils/timeConvert'
 
 interface Movie {
   _id: string
@@ -140,7 +141,7 @@ const SearchMovieScreen = ({ route, navigation }) => {
                     />
 
                     <Text style={{ color: '#F2F2F2' }}>
-                      {item.releaseDate.slice(0, 10).replaceAll('-', '.')}
+                      {UnixToTime(item?.releaseDate)}
                     </Text>
                   </View>
                 </View>

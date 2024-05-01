@@ -20,6 +20,7 @@ import { userSelector } from '../../redux/reducers/userReducer'
 import Carousel from '../../components/Carousel'
 import CustomHeader from '../../components/CustomHeader'
 import FetchingApi from '../../components/FetchingApi'
+import { UnixToTime } from '../../utils/timeConvert'
 
 import {
   searchMovie,
@@ -254,7 +255,7 @@ const HomeScreen = ({ navigation }) => {
                       />
 
                       <Text numberOfLines={1} style={{ color: '#F2F2F2' }}>
-                        {item.genres.join(', ')}
+                        {item?.genres.join(', ')}
                       </Text>
                     </View>
                     <View style={styles.comingSoonInfoContainer}>
@@ -265,7 +266,7 @@ const HomeScreen = ({ navigation }) => {
                       />
 
                       <Text style={{ color: '#F2F2F2' }}>
-                        {item.releaseDate.slice(0, 10).replaceAll('-', '.')}
+                        {UnixToTime(item.releaseDate)}
                       </Text>
                     </View>
                   </View>

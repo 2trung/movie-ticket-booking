@@ -41,7 +41,7 @@ const createNew = async (data) => {
       .collection(USER_COLLECTION_NAME)
       .findOne({ email: validatedData.email })
     if (emailExist) {
-      throw new Error('Email already exist!')
+      throw new Error('Email đã đăng ký!')
     }
     const createdUser = await GET_DB()
       .collection(USER_COLLECTION_NAME)
@@ -121,6 +121,26 @@ const updateProfile = async (_id, data) => {
     throw new Error(error)
   }
 }
+const getAll = async (page, pageSize) => {
+  try {
+    const totalItems = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .countDocuments()
+    const totalPages = Math.ceil(totalItems / pageSize)
+    if (page > totalPages) {
+      page = totalPages
+    }
+    const users = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .find()
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray()
+    return { users, page, totalPages }
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -130,4 +150,5 @@ export const userModel = {
   updateToken,
   changePassword,
   updateProfile,
+  getAll,
 }

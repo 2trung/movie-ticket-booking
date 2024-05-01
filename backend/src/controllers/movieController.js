@@ -27,10 +27,7 @@ const getMovieDetails = async (req, res, next) => {
 }
 const getMovieSchedule = async (req, res, next) => {
   try {
-    const response = await movieService.getMovieSchedule(
-      req.query.cinemaId,
-      req.query.movieId
-    )
+    const response = await movieService.getMovieSchedule(req.query.movieId)
     res.status(StatusCodes.OK).json(response)
   } catch (error) {
     next(error)
@@ -60,6 +57,22 @@ const searchMovie = async (req, res, next) => {
     next(error)
   }
 }
+const getAllMovies = async (req, res, next) => {
+  try {
+    const response = await movieService.getAllMovies()
+    res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    next(error)
+  }
+}
+const update = async (req, res, next) => {
+  try {
+    const response = await movieService.update(req.body)
+    res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const movieController = {
   addMovie,
@@ -69,4 +82,6 @@ export const movieController = {
   getNowPlaying,
   getComingSoon,
   searchMovie,
+  getAllMovies,
+  update,
 }

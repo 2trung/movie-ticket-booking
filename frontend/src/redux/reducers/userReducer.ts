@@ -102,7 +102,6 @@ export const updateAvatar = createAsyncThunk(
   async (avatar: any, thunkAPI) => {
     try {
       const response = await updateAvatarAPI(avatar)
-      console.log(response)
       return response
     } catch (error) {
       if (error.response) {

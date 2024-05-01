@@ -25,7 +25,6 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  createOrder,
   orderSelector,
   createPaymentUrl,
   paymentUrlSelector,
@@ -49,7 +48,8 @@ const PaymentScreen = ({ route, navigation }) => {
   const paymentUrl = useSelector(paymentUrlSelector)
 
   useEffect(() => {
-    dispatch(createOrder(route?.params) as any)
+    const orderId = route?.params?.orderId || orderDetail.order_id
+    dispatch(getOrderDetail(orderId) as any)
     const interval = setInterval(() => {
       setTime((prev) => {
         if (prev === 0) {
@@ -86,7 +86,7 @@ const PaymentScreen = ({ route, navigation }) => {
   }
   // Nếu thanh toán thành công thì chuyển hướng sang màn hình vé đã đặt
   useEffect(() => {
-    if (orderDetail.status === 'success') {
+    if (orderDetail?.status === 'success') {
       navigation.navigate('TicketsScreen')
     }
   }, [orderDetail])

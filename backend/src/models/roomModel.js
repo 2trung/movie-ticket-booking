@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { ObjectId } from 'mongodb'
+import { cinemaModel } from './cinemaModel'
 
 const ROOM_COLLECTION_NAME = 'rooms'
 const ROOM_COLLECTION_SCHEMA = Joi.object({
@@ -20,7 +21,12 @@ const getById = async (_id) => {
     const room = await GET_DB()
       .collection(ROOM_COLLECTION_NAME)
       .findOne({ _id: new ObjectId(String(_id)) })
-    return room
+    const cinema = await cinemaModel.getById(room.cinema_id)
+    return {
+      ...room,
+      cinema_name: cinema.name,
+      cinema_location: cinema.location,
+    }
   } catch (error) {
     throw new Error(error)
   }

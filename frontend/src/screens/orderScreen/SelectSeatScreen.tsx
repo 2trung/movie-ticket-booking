@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import {
   scheduleDetailSelector,
   getScheduleDetail,
+  createOrder,
 } from '../../redux/reducers/orderReducer'
 import { useSelector, useDispatch } from 'react-redux'
 
@@ -98,6 +99,12 @@ const SelectSeatScreen = ({ route, navigation }) => {
 
   const handleCreateOrder = async () => {
     if (selectingSeats.length === 0) return Alert.alert('Vui lòng chọn ghế')
+    dispatch(
+      createOrder({
+        scheduleId: scheduleDetail._id,
+        seats: selectingSeats,
+      }) as any
+    )
     navigation.navigate('PaymentScreen', {
       scheduleId: scheduleDetail._id,
       seats: selectingSeats,

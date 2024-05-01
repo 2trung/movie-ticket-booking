@@ -106,7 +106,6 @@ const updateProfile = async (req, res, next) => {
     email: Joi.string().email().required().trim().strict(),
     name: Joi.string().min(3).max(50).trim().strict().allow(''),
     phone: Joi.string().min(10).max(15).trim().strict().allow(''),
-    avatar: Joi.string().trim().strict(),
   })
   try {
     await correctCondition.validateAsync(req.body, { abortEarly: false })

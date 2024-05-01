@@ -200,8 +200,7 @@ export const cancelOrder = createAsyncThunk(
   async (orderId: string, thunkAPI) => {
     try {
       const response = await cancelOrderAPI(orderId)
-      const jsonData = response.data
-      return jsonData
+      return response
     } catch (error) {
       if (error.response) {
         return thunkAPI.rejectWithValue(error.response.data)
@@ -233,15 +232,43 @@ const orderSlice = createSlice({
     builder.addCase(createOrder.fulfilled, (state, action) => {
       state.orderData = action.payload
     })
+    builder.addCase(createOrder.rejected, (state, action) => {
+      Toast.show({
+        type: 'error',
+        text1: (action.payload as any)?.message,
+      })
+    })
+
     builder.addCase(getOrderDetail.fulfilled, (state, action) => {
       state.orderData = action.payload
     })
+    builder.addCase(getOrderDetail.rejected, (state, action) => {
+      Toast.show({
+        type: 'error',
+        text1: (action.payload as any)?.message,
+      })
+    })
+
     builder.addCase(getMovieSchedules.fulfilled, (state, action) => {
       state.schedulesData = action.payload
     })
+    builder.addCase(getMovieSchedules.rejected, (state, action) => {
+      Toast.show({
+        type: 'error',
+        text1: (action.payload as any)?.message,
+      })
+    })
+
     builder.addCase(getScheduleDetail.fulfilled, (state, action) => {
       state.scheduleDetailData = action.payload
     })
+    builder.addCase(getScheduleDetail.rejected, (state, action) => {
+      Toast.show({
+        type: 'error',
+        text1: (action.payload as any)?.message,
+      })
+    })
+
     builder.addCase(createPaymentUrl.fulfilled, (state, action) => {
       state.paymentUrl = action.payload
     })
@@ -249,6 +276,12 @@ const orderSlice = createSlice({
       state.orderData = action.payload
       Toast.show({
         type: 'success',
+        text1: (action.payload as any)?.message,
+      })
+    })
+    builder.addCase(cancelOrder.rejected, (state, action) => {
+      Toast.show({
+        type: 'error',
         text1: (action.payload as any)?.message,
       })
     })
