@@ -16,6 +16,7 @@ import FetchingApi from '../../components/FetchingApi'
 import CustomHeader from '../../components/CustomHeader'
 import { RouteProp } from '@react-navigation/native'
 
+import PersonCard from '../../components/PersonCard'
 import { useSelector } from 'react-redux'
 import {
   getMovieDetail,
@@ -220,24 +221,25 @@ const MovieDetailScreen = ({ route, navigation }) => {
             contentContainerStyle={{ gap: 10 }}
           >
             {movieDetail?.cast.map((actor) => (
-              <View key={actor._id} style={styles.personContainer}>
-                <Image
-                  source={{ uri: actor.photo }}
-                  style={styles.personPhoto}
-                />
-                <View style={{ justifyContent: 'center' }}>
-                  <Text style={{ color: '#f2f2f2' }}>
-                    {actor.name.split(' ').length > 1
-                      ? actor.name.split(' ')[0]
-                      : actor.name}
-                  </Text>
-                  {actor.name.split(' ').length > 1 && (
-                    <Text style={{ color: '#f2f2f2' }} numberOfLines={1}>
-                      {actor.name.split(' ').slice(1).join(' ')}
-                    </Text>
-                  )}
-                </View>
-              </View>
+              <PersonCard key={actor._id} actor={actor} />
+              // <View key={actor._id} style={styles.personContainer}>
+              //   <Image
+              //     source={{ uri: actor.photo }}
+              //     style={styles.personPhoto}
+              //   />
+              //   <View style={{ justifyContent: 'center' }}>
+              //     <Text style={{ color: '#f2f2f2' }}>
+              //       {actor.name.split(' ').length > 1
+              //         ? actor.name.split(' ')[0]
+              //         : actor.name}
+              //     </Text>
+              //     {actor.name.split(' ').length > 1 && (
+              //       <Text style={{ color: '#f2f2f2' }} numberOfLines={1}>
+              //         {actor.name.split(' ').slice(1).join(' ')}
+              //       </Text>
+              //     )}
+              //   </View>
+              // </View>
             ))}
           </ScrollView>
         </View>
