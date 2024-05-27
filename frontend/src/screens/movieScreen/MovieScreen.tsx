@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import { UnixToTime } from '../../utils/timeConvert'
 
+import MovieCard from '../../components/MovieCard'
 import { useDispatch } from 'react-redux'
 import { setOrder } from '../../redux/reducers/orderReducer'
 import { moviesSelector } from '../../redux/reducers/movieReducer'
@@ -118,6 +119,7 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
+  
       <FlatList
         data={isNowPlaying ? nowPlaying : comingSoon}
         contentContainerStyle={{
@@ -125,42 +127,46 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
         }}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         renderItem={({ item, index }) => (
-          <Pressable
-            key={index}
-            style={{ width: POSTER_WIDTH }}
-            onPress={() => handleSelectMovie(item)}
-          >
-            <Image
-              source={{ uri: item.poster }}
-              style={styles.comingSoonPoster}
-            />
-            <View style={{ flex: 1, justifyContent: 'space-between' }}>
-              <Text numberOfLines={2} style={styles.comingSoonTitle}>
-                {item.title}
-              </Text>
+          <MovieCard item={item}
+          index={index}
+          handleSelectMovie={handleSelectMovie} 
+          />
+          // <Pressable
+          //   key={index}
+          //   style={{ width: POSTER_WIDTH }}
+          //   onPress={() => handleSelectMovie(item)}
+          // >
+          //   <Image
+          //     source={{ uri: item.poster }}
+          //     style={styles.comingSoonPoster}
+          //   />
+          //   <View style={{ flex: 1, justifyContent: 'space-between' }}>
+          //     <Text numberOfLines={2} style={styles.comingSoonTitle}>
+          //       {item.title}
+          //     </Text>
 
-              <View>
-                <View style={styles.comingSoonInfoContainer}>
-                  <Ionicons name='videocam-outline' size={16} color='#F2F2F2' />
+          //     <View>
+          //       <View style={styles.comingSoonInfoContainer}>
+          //         <Ionicons name='videocam-outline' size={16} color='#F2F2F2' />
 
-                  <Text
-                    numberOfLines={1}
-                    style={{ color: '#F2F2F2', width: '80%' }}
-                  >
-                    {item.genres.join(', ')}
-                  </Text>
-                </View>
-                <View style={styles.comingSoonInfoContainer}>
-                  <Ionicons name='calendar-outline' size={16} color='#F2F2F2' />
+          //         <Text
+          //           numberOfLines={1}
+          //           style={{ color: '#F2F2F2', width: '80%' }}
+          //         >
+          //           {item.genres.join(', ')}
+          //         </Text>
+          //       </View>
+          //       <View style={styles.comingSoonInfoContainer}>
+          //         <Ionicons name='calendar-outline' size={16} color='#F2F2F2' />
 
-                  <Text style={{ color: '#F2F2F2' }}>
-                    {UnixToTime(item?.releaseDate)}
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View style={{ height: 24 }} />
-          </Pressable>
+          //         <Text style={{ color: '#F2F2F2' }}>
+          //           {UnixToTime(item?.releaseDate)}
+          //         </Text>
+          //       </View>
+          //     </View>
+          //   </View>
+          //   <View style={{ height: 24 }} />
+          // </Pressable>
         )}
         numColumns={2}
       />

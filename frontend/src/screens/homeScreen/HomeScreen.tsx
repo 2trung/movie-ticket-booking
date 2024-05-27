@@ -18,6 +18,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { userSelector } from '../../redux/reducers/userReducer'
 
 import Carousel from '../../components/Carousel'
+import MovieCard from '../../components/MovieCard'
 import CustomHeader from '../../components/CustomHeader'
 import FetchingApi from '../../components/FetchingApi'
 import { UnixToTime } from '../../utils/timeConvert'
@@ -228,50 +229,56 @@ const HomeScreen = ({ navigation }) => {
               <Feather name='chevron-right' size={14} color='#FCC434' />
             </TouchableOpacity>
           </View>
+          
           <FlatList
             horizontal
             data={data?.comingSoon}
             contentContainerStyle={{ paddingHorizontal: 20, gap: 20 }}
             renderItem={({ item, index }) => (
-              <Pressable
-                style={{ width: 180 }}
-                onPress={() => handleSelectMovie(item)}
-              >
-                <Image
-                  source={{ uri: item.poster }}
-                  style={styles.comingSoonPoster}
+              <MovieCard
+                item={item}
+                index={index}
+                handleSelectMovie={handleSelectMovie}
                 />
-                <View style={{ flex: 1, justifyContent: 'space-between' }}>
-                  <Text numberOfLines={2} style={styles.comingSoonTitle}>
-                    {item.title}
-                  </Text>
+              // <Pressable
+              //   style={{ width: 180 }}
+              //   onPress={() => handleSelectMovie(item)}
+              // >
+              //   <Image
+              //     source={{ uri: item.poster }}
+              //     style={styles.comingSoonPoster}
+              //   />
+              //   <View style={{ flex: 1, justifyContent: 'space-between' }}>
+              //     <Text numberOfLines={2} style={styles.comingSoonTitle}>
+              //       {item.title}
+              //     </Text>
 
-                  <View>
-                    <View style={styles.comingSoonInfoContainer}>
-                      <Ionicons
-                        name='videocam-outline'
-                        size={16}
-                        color='#F2F2F2'
-                      />
+              //     <View>
+              //       <View style={styles.comingSoonInfoContainer}>
+              //         <Ionicons
+              //           name='videocam-outline'
+              //           size={16}
+              //           color='#F2F2F2'
+              //         />
 
-                      <Text numberOfLines={1} style={{ color: '#F2F2F2' }}>
-                        {item?.genres.join(', ')}
-                      </Text>
-                    </View>
-                    <View style={styles.comingSoonInfoContainer}>
-                      <Ionicons
-                        name='calendar-outline'
-                        size={16}
-                        color='#F2F2F2'
-                      />
+              //         <Text numberOfLines={1} style={{ color: '#F2F2F2' }}>
+              //           {item?.genres.join(', ')}
+              //         </Text>
+              //       </View>
+              //       <View style={styles.comingSoonInfoContainer}>
+              //         <Ionicons
+              //           name='calendar-outline'
+              //           size={16}
+              //           color='#F2F2F2'
+              //         />
 
-                      <Text style={{ color: '#F2F2F2' }}>
-                        {UnixToTime(item.releaseDate)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </Pressable>
+              //         <Text style={{ color: '#F2F2F2' }}>
+              //           {UnixToTime(item.releaseDate)}
+              //         </Text>
+              //       </View>
+              //     </View>
+              //   </View>
+              // </Pressable>
             )}
           />
         </View>
