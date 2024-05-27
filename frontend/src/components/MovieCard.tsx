@@ -6,7 +6,7 @@ import {  FlatList,
     Pressable,
     Dimensions
 } from 'react-native'
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { UnixToTime } from '../utils/timeConvert'
 import { Ionicons } from '@expo/vector-icons'
 
@@ -75,45 +75,6 @@ const MovieCard: React.FC<ContainerComponentProps> = ({
                 </View>
                 <View style={{ height: 24 }} />
             </Pressable>
-            // <Pressable
-            // style={{ width: 180 }}
-            // onPress={() => handleSelectMovie(item)}
-            // >
-            // <Image
-            //     source={{ uri: item.poster }}
-            //     style={styles.Poster}
-            // />
-            // <View style={{ flex: 1, justifyContent: 'space-between' }}>
-            //     <Text numberOfLines={2} style={styles.Title}>
-            //     {item.title}
-            //     </Text>
-
-            //     <View>
-            //     <View style={styles.InfoContainer}>
-            //         <Ionicons
-            //         name='videocam-outline'
-            //         size={16}
-            //         color='#F2F2F2'
-            //         />
-
-            //         <Text numberOfLines={1} style={{ color: '#F2F2F2' }}>
-            //         {item?.genres.join(', ')}
-            //         </Text>
-            //     </View>
-            //     <View style={styles.InfoContainer}>
-            //         <Ionicons
-            //         name='calendar-outline'
-            //         size={16}
-            //         color='#F2F2F2'
-            //         />
-
-            //         <Text style={{ color: '#F2F2F2' }}>
-            //         {UnixToTime(item.releaseDate)}
-            //         </Text>
-            //     </View>
-            //     </View>
-            // </View>
-            // </Pressable>
     )
     }
 

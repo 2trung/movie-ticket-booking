@@ -4,17 +4,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   FlatList,
-  Image,
   Dimensions,
-  Pressable,
   SafeAreaView,
   Platform,
   StatusBar,
 } from 'react-native'
 import { RouteProp } from '@react-navigation/native'
 import { useEffect, useState } from 'react'
-import { Ionicons } from '@expo/vector-icons'
-import { UnixToTime } from '../../utils/timeConvert'
 
 import MovieCard from '../../components/MovieCard'
 import { useDispatch } from 'react-redux'
@@ -46,8 +42,6 @@ interface MovieScreenProps {
   navigation: any
 }
 
-const SCREEN_WIDTH = Dimensions.get('window').width
-const POSTER_WIDTH = SCREEN_WIDTH > 180 * 2 + 20 ? 180 : SCREEN_WIDTH / 2 - 20
 
 const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
   const [isNowPlaying, setIsNowPlaying] = useState(true)
@@ -131,42 +125,6 @@ const MovieScreen: React.FC<MovieScreenProps> = ({ route, navigation }) => {
           index={index}
           handleSelectMovie={handleSelectMovie} 
           />
-          // <Pressable
-          //   key={index}
-          //   style={{ width: POSTER_WIDTH }}
-          //   onPress={() => handleSelectMovie(item)}
-          // >
-          //   <Image
-          //     source={{ uri: item.poster }}
-          //     style={styles.comingSoonPoster}
-          //   />
-          //   <View style={{ flex: 1, justifyContent: 'space-between' }}>
-          //     <Text numberOfLines={2} style={styles.comingSoonTitle}>
-          //       {item.title}
-          //     </Text>
-
-          //     <View>
-          //       <View style={styles.comingSoonInfoContainer}>
-          //         <Ionicons name='videocam-outline' size={16} color='#F2F2F2' />
-
-          //         <Text
-          //           numberOfLines={1}
-          //           style={{ color: '#F2F2F2', width: '80%' }}
-          //         >
-          //           {item.genres.join(', ')}
-          //         </Text>
-          //       </View>
-          //       <View style={styles.comingSoonInfoContainer}>
-          //         <Ionicons name='calendar-outline' size={16} color='#F2F2F2' />
-
-          //         <Text style={{ color: '#F2F2F2' }}>
-          //           {UnixToTime(item?.releaseDate)}
-          //         </Text>
-          //       </View>
-          //     </View>
-          //   </View>
-          //   <View style={{ height: 24 }} />
-          // </Pressable>
         )}
         numColumns={2}
       />
@@ -189,22 +147,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  comingSoonPoster: {
-    width: POSTER_WIDTH,
-    height: POSTER_WIDTH * 1.4,
-    borderRadius: 16,
-  },
-  comingSoonTitle: {
-    color: '#FCC434',
-    marginTop: 10,
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  comingSoonInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
   },
 })
 

@@ -193,20 +193,7 @@ const MovieDetailScreen = ({ route, navigation }) => {
             variant='heading1'
             style={{ paddingVertical: 20 }}
           />
-          <View style={styles.personContainer}>
-            <Image
-              source={{ uri: movieDetail?.director.photo }}
-              style={styles.personPhoto}
-            />
-            <View style={{ justifyContent: 'center' }}>
-              <Text style={{ color: '#f2f2f2' }}>
-                {movieDetail?.director.name.split(' ')[0]}
-              </Text>
-              <Text style={{ color: '#f2f2f2' }}>
-                {movieDetail?.director.name.split(' ').slice(1).join(' ')}
-              </Text>
-            </View>
-          </View>
+          <PersonCard actor={movieDetail?.director} />
         </View>
 
         <View style={{ paddingHorizontal: 20 }}>
@@ -222,24 +209,6 @@ const MovieDetailScreen = ({ route, navigation }) => {
           >
             {movieDetail?.cast.map((actor) => (
               <PersonCard key={actor._id} actor={actor} />
-              // <View key={actor._id} style={styles.personContainer}>
-              //   <Image
-              //     source={{ uri: actor.photo }}
-              //     style={styles.personPhoto}
-              //   />
-              //   <View style={{ justifyContent: 'center' }}>
-              //     <Text style={{ color: '#f2f2f2' }}>
-              //       {actor.name.split(' ').length > 1
-              //         ? actor.name.split(' ')[0]
-              //         : actor.name}
-              //     </Text>
-              //     {actor.name.split(' ').length > 1 && (
-              //       <Text style={{ color: '#f2f2f2' }} numberOfLines={1}>
-              //         {actor.name.split(' ').slice(1).join(' ')}
-              //       </Text>
-              //     )}
-              //   </View>
-              // </View>
             ))}
           </ScrollView>
         </View>
@@ -349,15 +318,6 @@ const styles = StyleSheet.create({
     borderColor: '#bfbfbf',
     borderWidth: 1,
   },
-  personContainer: {
-    width: 150,
-    padding: 10,
-    backgroundColor: '#1C1C1C',
-    flexDirection: 'row',
-    gap: 10,
-    borderRadius: 12,
-  },
-  personPhoto: { height: 36, width: 36, borderRadius: 999 },
   footerContainer: {
     position: 'absolute',
     paddingVertical: 20,

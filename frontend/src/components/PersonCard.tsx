@@ -1,10 +1,8 @@
-import {  FlatList,
+import {
     Image,
     View,
     StyleSheet,
     Text,
-    Pressable,
-    Dimensions
 } from 'react-native'
 
 interface person {
