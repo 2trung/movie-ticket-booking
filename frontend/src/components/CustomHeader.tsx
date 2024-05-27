@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, StyleSheet } from 'react-native'
 import PropTypes from 'prop-types'
 
-const CustomHeader = ({ text, variant, style }) => {
+const CustomHeader = ({ text = '', variant = '', style = {} }) => {
   let textStyle = {}
 
   switch (variant) {
@@ -62,11 +62,6 @@ CustomHeader.propTypes = {
   text: PropTypes.string.isRequired,
   variant: PropTypes.oneOf(['title', 'heading1', 'heading2', 'body1', 'body2']),
   style: PropTypes.object,
-}
-
-CustomHeader.defaultProps = {
-  variant: '',
-  style: {},
 }
 
 const styles = StyleSheet.create({
