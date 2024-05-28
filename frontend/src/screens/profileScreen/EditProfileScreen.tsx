@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     margin: 10,
     bottom: 0,
+    alignSelf: 'center',
   },
   textLarge: {
     fontSize: 20,

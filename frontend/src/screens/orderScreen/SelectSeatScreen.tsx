@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
-import CustomHeader from '../../components/CustomHeader'
+import FetchingApi from '../../components/FetchingApi'
 import { AntDesign } from '@expo/vector-icons'
 import { useEffect, useState } from 'react'
 import {
@@ -105,13 +105,10 @@ const SelectSeatScreen = ({ route, navigation }) => {
         seats: selectingSeats,
       }) as any
     )
-    navigation.navigate('PaymentScreen', {
-      scheduleId: scheduleDetail._id,
-      seats: selectingSeats,
-    })
+    navigation.navigate('PaymentScreen')
   }
 
-  if (!scheduleDetail) return <Text>Loading...</Text>
+  if (!scheduleDetail) return <FetchingApi />
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -219,7 +216,13 @@ const SelectSeatScreen = ({ route, navigation }) => {
           style={styles.footerButton}
           onPress={() => handleCreateOrder()}
         >
-          <Text style={{ color: '#000', fontSize: 20, fontWeight: '700' }}>
+          <Text
+            style={{
+              color: '#000',
+              fontSize: 20,
+              fontWeight: '700',
+            }}
+          >
             Mua vé
           </Text>
         </TouchableOpacity>
@@ -399,6 +402,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingVertical: 20,
+    paddingHorizontal: 10,
     position: 'absolute',
     bottom: 0,
     // borderTopColor: '#333333',
@@ -407,6 +411,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#000',
+    // justifyContent: 'center',
   },
   footerButton: {
     backgroundColor: '#FCC434',

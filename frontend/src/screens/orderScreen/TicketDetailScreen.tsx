@@ -120,14 +120,19 @@ const TicketDetailScreen = ({ route, navigation }) => {
               <AntDesign name='calendar' size={50} color='black' />
               <View style={{ justifyContent: 'space-around' }}>
                 <Text style={{ fontWeight: '500' }}>
-                  {ticketDetail.start_time.split('T')[1].slice(0, 5)}
+                  {new Date(ticketDetail.start_time).getHours()}
+                  {'h'}
+                  {new Date(ticketDetail.start_time).getMinutes() < 10
+                    ? '0' + new Date(ticketDetail.start_time).getMinutes()
+                    : new Date(ticketDetail.start_time).getMinutes()}
+                  {"'"}
                 </Text>
                 <Text style={{ fontWeight: '500' }}>
-                  {ticketDetail.start_time
-                    .split('T')[0]
-                    .split('-')
-                    .reverse()
-                    .join('.')}
+                  {new Date(ticketDetail.start_time).getDate() +
+                    '.' +
+                    new Date(ticketDetail.start_time).getMonth() +
+                    '.' +
+                    new Date(ticketDetail.start_time).getFullYear()}
                 </Text>
               </View>
             </View>

@@ -20,7 +20,7 @@ import {
 } from '../../redux/reducers/searchReducer'
 import { useDispatch, useSelector } from 'react-redux'
 import FetchingApi from '../../components/FetchingApi'
-import { UnixToTime } from '../../utils/timeConvert'
+import { UnixToTime } from '../../utils/convertDateTime'
 
 interface Movie {
   _id: string

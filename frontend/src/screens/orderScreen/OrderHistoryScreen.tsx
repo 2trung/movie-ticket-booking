@@ -13,14 +13,12 @@ import { useEffect, useState } from 'react'
 import FetchingApi from '../../components/FetchingApi'
 import { convertDateTime } from '../../utils/convertDateTime'
 import { AntDesign } from '@expo/vector-icons'
-import { setOrder } from '../../redux/reducers/orderReducer'
-import Toast from 'react-native-toast-message'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   getOrdersHistory,
   orderSelector,
 } from '../../redux/reducers/ticketReducer'
-import { cancelOrder } from '../../redux/reducers/orderReducer'
+import { cancelOrder, getOrderDetail } from '../../redux/reducers/orderReducer'
 
 const OrderHistoryScreen = ({ navigation }) => {
   const [selecting, setSelecting] = useState('')
@@ -34,7 +32,8 @@ const OrderHistoryScreen = ({ navigation }) => {
   }, [refreshKey])
 
   const handleRePayment = async (orderId: string) => {
-    navigation.navigate('PaymentScreen', { orderId })
+    dispatch(getOrderDetail(orderId) as any)
+    navigation.navigate('PaymentScreen')
   }
 
   const handleCancelOrder = async (orderId) => {

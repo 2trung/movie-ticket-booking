@@ -1,14 +1,14 @@
 import { Text, View, TouchableOpacity, StyleSheet } from 'react-native'
 import { TextInput, Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-import { loginAPI } from '../../apis/userApi'
 import { isValidateEmail } from '../../utils/emailValidate'
 
 import { useDispatch } from 'react-redux'
 import { login } from '../../redux/reducers/authReducer'
 import { authSelector } from '../../redux/reducers/authReducer'
+import { getUser } from '../../redux/reducers/userReducer'
 import { useSelector } from 'react-redux'
 
 import ContainerComponent from '../../components/ContainerComponent'
@@ -42,6 +42,7 @@ const LoginScreen = ({ navigation }) => {
         })
       }
       await dispatch(login({ email, password }) as any)
+      await dispatch(getUser() as any)
     } catch (error) {
       console.log(error)
     }
