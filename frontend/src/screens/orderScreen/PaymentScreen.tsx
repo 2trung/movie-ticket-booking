@@ -35,7 +35,7 @@ import { convertDateTime } from '../../utils/convertDateTime'
 import CustomHeader from '../../components/CustomHeader'
 import FetchingApi from '../../components/FetchingApi'
 
-const PaymentScreen = ({ route, navigation }) => {
+const PaymentScreen = ({ navigation }) => {
   const dispatch = useDispatch()
 
   const [time, setTime] = useState(900)
@@ -48,8 +48,6 @@ const PaymentScreen = ({ route, navigation }) => {
   const paymentUrl = useSelector(paymentUrlSelector)
 
   useEffect(() => {
-    const orderId = route?.params?.orderId || orderDetail.order_id
-    dispatch(getOrderDetail(orderId) as any)
     const interval = setInterval(() => {
       setTime((prev) => {
         if (prev === 0) {
